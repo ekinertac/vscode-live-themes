@@ -440,8 +440,16 @@ class VSCodeThemeDownloader(ThemeDownloader):
             logging.warning(f"Theme file not found: {full_theme_path}")
             return None
 
+        # Remove "./" from the beginning of the relative_theme_path if present
+        cleaned_relative_path = relative_theme_path.lstrip("./")
+
+        # Join theme_dir with the cleaned relative path and remove "./" if present
+        full_path = os.path.join(theme_dir, "extension", cleaned_relative_path).lstrip(
+            "./"
+        )
+
         logging.debug(f"Added theme: {theme_name}")
-        return {"file": relative_theme_path, "name": theme_name}
+        return {"file": full_path, "name": theme_name}
 
 
 class ThemeManager:
