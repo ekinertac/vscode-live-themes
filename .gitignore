@@ -9,3 +9,16 @@ server/themes/archives/*
 server/themes/themes/*
 
 !.gitkeep
+
+__pycache__
+.pytest_cache
+htmlcov
+.coverage
+.coverage.*
+.cache
+no
+.tox
+.nox
+.venv
+.env
+.DS_Store
