@@ -6,15 +6,27 @@ export interface ThemeCache {
 }
 
 export interface Theme {
+  categories: string[];
   displayName: string;
+  publisher: {
+    displayName: string;
+    publisherName: string;
+  };
+  tags: string[];
+  extension: {
+    extensionId: string;
+    extensionName: string;
+    latestVersion: string;
+    downloadUrl: string;
+  };
   theme_files: ThemeFile[];
-  // Add other properties as needed
+  vsix_path: string;
+  theme_dir: string;
 }
 
 export interface ThemeFile {
   name: string;
   file: string;
-  // Add other properties as needed
 }
 
 export interface ThemeQuickPickItem extends vscode.QuickPickItem {

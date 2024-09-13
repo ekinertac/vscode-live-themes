@@ -13,10 +13,10 @@ const THEMES_CACHE_KEY = 'liveThemes.cachedThemes';
 function restoreOriginalConfigurations() {
   vscode.workspace
     .getConfiguration('editor')
-    .update('tokenColorCustomizations', originalTokenColors, vscode.ConfigurationTarget.Global);
+    .update('tokenColorCustomizations', originalTokenColors, vscode.ConfigurationTarget.Workspace);
   vscode.workspace
     .getConfiguration('workbench')
-    .update('colorCustomizations', originalColors, vscode.ConfigurationTarget.Global);
+    .update('colorCustomizations', originalColors, vscode.ConfigurationTarget.Workspace);
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -77,10 +77,14 @@ export function activate(context: vscode.ExtensionContext) {
 
               await vscode.workspace
                 .getConfiguration('editor')
-                .update('tokenColorCustomizations', { textMateRules: tokenColors }, vscode.ConfigurationTarget.Global);
+                .update(
+                  'tokenColorCustomizations',
+                  { textMateRules: tokenColors },
+                  vscode.ConfigurationTarget.Workspace,
+                );
               await vscode.workspace
                 .getConfiguration('workbench')
-                .update('colorCustomizations', colors, vscode.ConfigurationTarget.Global);
+                .update('colorCustomizations', colors, vscode.ConfigurationTarget.Workspace);
             }
           } catch (error) {
             console.error('Error fetching theme file:', error);
@@ -136,11 +140,11 @@ export function activate(context: vscode.ExtensionContext) {
                   .update(
                     'tokenColorCustomizations',
                     { textMateRules: tokenColors },
-                    vscode.ConfigurationTarget.Global,
+                    vscode.ConfigurationTarget.Workspace,
                   );
                 await vscode.workspace
                   .getConfiguration('workbench')
-                  .update('colorCustomizations', colors, vscode.ConfigurationTarget.Global);
+                  .update('colorCustomizations', colors, vscode.ConfigurationTarget.Workspace);
               } catch (error) {
                 console.error('Error fetching theme file:', error);
                 restoreOriginalConfigurations();
@@ -155,10 +159,20 @@ export function activate(context: vscode.ExtensionContext) {
             if (selectedFile === goBackItem) {
               goBack();
             } else if (selectedFile) {
-              console.log(`Selected theme file: ${selectedFile.label} (${selectedFile.description})`);
-              fileQuickPick.hide();
-              // Here you can add logic to apply the selected theme file permanently
-              vscode.window.showInformationMessage(`Theme applied: ${selectedTheme.label} - ${selectedFile.label}`);
+              //MARK: Final select
+              const theme = selectedTheme.theme;
+              // vscode.commands.executeCommand(
+              // 'workbench.extensions.installExtension',
+              // `${theme.publisher.publisherName}.${theme.extension.extensionName}`,
+              // );
+
+              vscode.commands.executeCommand('workbench.extensions.action.showExtensionsWithIds', [
+                `${theme.publisher.publisherName}.${theme.extension.extensionName}`,
+              ]);
+
+              fileQuickPick.dispose();
+              quickPick.dispose();
+              restoreOriginalConfigurations();
             }
           });
 
