@@ -560,10 +560,6 @@ def run_command(manager: ThemeManager, command: str) -> None:
         manager.fetch_and_save_themes()
     elif command == "download":
         manager.download_themes()
-    elif command == "all":
-        manager.clear_metadata()
-        manager.fetch_and_save_themes()
-        manager.download_themes()
     elif command == "clear_metadata":
         manager.clear_metadata()
     elif command == "clear_cache":
@@ -573,6 +569,12 @@ def run_command(manager: ThemeManager, command: str) -> None:
         manager.clear_metadata()
         manager.clear_archives()
         manager.clear_themes()
+    elif command == "all":
+        manager.clear_metadata()
+        manager.clear_archives()
+        manager.clear_themes()
+        manager.fetch_and_save_themes()
+        manager.download_themes()
 
 
 def main():
