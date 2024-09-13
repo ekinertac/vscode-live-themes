@@ -15,7 +15,15 @@
     "commands": [
       {
         "command": "live-themes.logToConsole",
-        "title": "Live Themes: Log to Console"
+        "title": "Live Themes: Open Theme Selector"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "live-themes.logToConsole",
+        "key": "ctrl+shift+t",
+        "mac": "cmd+shift+t",
+        "when": "editorTextFocus"
       }
     ]
   },
