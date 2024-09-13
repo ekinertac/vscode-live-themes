@@ -554,11 +554,18 @@ class ThemeManager:
                 os.remove(delete_file)
 
         # walk recursively in folders in themes and delete empty folders
-        for root, dirs, files in os.walk("themes/themes"):
-            for dir in dirs:
-                dir_path = os.path.join(root, dir)
-                if os.path.isdir(dir_path) and not os.listdir(dir_path):
-                    os.rmdir(dir_path)
+        # Recursively remove empty subfolders
+        self._remove_empty_folders("themes/themes")
+
+    def _remove_empty_folders(self, path: str) -> None:
+        for folder in os.listdir(path):
+            full_path = os.path.join(path, folder)
+            if os.path.isdir(full_path):
+                self._remove_empty_folders(full_path)
+
+        # If the directory is empty, delete it
+        if not os.listdir(path):
+            os.rmdir(path)
 
 
 def create_manager(
