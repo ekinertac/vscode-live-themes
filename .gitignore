@@ -3,7 +3,9 @@ dist
 node_modules
 .vscode-test/
 *.vsix
-!.gitkeep
+venv
 
 server/themes/archives/*
 server/themes/themes/*
+
+!.gitkeep
