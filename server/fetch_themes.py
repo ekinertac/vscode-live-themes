@@ -210,17 +210,21 @@ class VSCodeThemeFetcher(ThemeFetcher):
                 {
                     "categories": extension["categories"],
                     "displayName": extension["displayName"],
-                    "publisher.displayName": extension["publisher"]["displayName"],
-                    "publisher.publisherName": extension["publisher"]["publisherName"],
+                    "publisher": {
+                        "displayName": extension["publisher"]["displayName"],
+                        "publisherName": extension["publisher"]["publisherName"],
+                    },
                     "tags": extension["tags"],
-                    "extension.extensionId": extension["extensionId"],
-                    "extension.extensionName": extension["extensionName"],
-                    "extension.latestVersion": extension["versions"][0]["version"],
-                    "extension.downloadUrl": self._get_download_url(
-                        extension["publisher"]["publisherName"],
-                        extension["extensionName"],
-                        extension["versions"][0]["version"],
-                    ),
+                    "extension": {
+                        "extensionId": extension["extensionId"],
+                        "extensionName": extension["extensionName"],
+                        "latestVersion": extension["versions"][0]["version"],
+                        "downloadUrl": self._get_download_url(
+                            extension["publisher"]["publisherName"],
+                            extension["extensionName"],
+                            extension["versions"][0]["version"],
+                        ),
+                    },
                 }
             )
         return themes
@@ -290,9 +294,9 @@ class VSCodeThemeDownloader(ThemeDownloader):
         Returns:
             Dict[str, Any]: An updated theme dictionary with download information.
         """
-        publisher_name = theme["publisher.publisherName"]
-        extension_name = theme["extension.extensionName"]
-        download_url = theme["extension.downloadUrl"]
+        publisher_name = theme["publisher"]["publisherName"]
+        extension_name = theme["extension"]["extensionName"]
+        download_url = theme["extension"]["downloadUrl"]
 
         logging.info(f"Processing theme: {publisher_name}.{extension_name}")
 
