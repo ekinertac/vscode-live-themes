@@ -1,11 +1,11 @@
 {
-  "name": "better-faster-search",
-  "displayName": "Better Faster Search",
-  "description": "A better search in project alternative for Visual Studio Code",
-  "version": "1.1.0",
+  "name": "live-theme-previewer",
+  "displayName": "Live Theme Previewer",
+  "description": "A live theme previewer for Visual Studio Code",
+  "version": "1.0.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ekinertac/vscode-better-search.git"
+    "url": "https://github.com/ekinertac/vscode-live-themes.git"
   },
   "publisher": "ekinertac",
   "author": {
@@ -14,10 +14,10 @@
   },
   "icon": "images/icon.png",
   "license": "MIT",
-  "homepage": "https://github.com/ekinertac/vscode-better-search",
+  "homepage": "https://github.com/ekinertac/vscode-live-themes",
   "bugs": {
     "email": "ekinertac@gmail.com",
-    "url": "https://github.com/ekinertac/vscode-better-search/issues"
+    "url": "https://github.com/ekinertac/vscode-live-themes/issues"
   },
   "engines": {
     "vscode": "^1.87.0"
