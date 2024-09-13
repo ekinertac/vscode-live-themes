@@ -206,6 +206,7 @@ class VSCodeThemeFetcher(ThemeFetcher):
                 )
                 continue
 
+            # MARK: List.json
             themes.append(
                 {
                     "categories": extension["categories"],

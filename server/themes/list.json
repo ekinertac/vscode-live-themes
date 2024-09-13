@@ -1,1 +1,228 @@
-[{"categories": ["Themes"], "displayName": "C/C++ Themes", "publisher.displayName": "Microsoft", "publisher.publisherName": "ms-vscode", "tags": ["__web_extension", "C", "C++", "color-theme", "Microsoft", "Theme", "Themes"], "extension.extensionId": "99b17261-8f6e-45f0-9ad5-a69c6f509a4f", "extension.extensionName": "cpptools-themes", "extension.latestVersion": "2.0.0", "extension.downloadUrl": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/ms-vscode/vsextensions/cpptools-themes/2.0.0/vspackage", "theme_files": [{"file": "themes/themes/ms-vscode.cpptools-themes/extension/themes/cpptools_dark_vs_new.json", "name": "Dark (Visual Studio - C/C++)"}, {"file": "themes/themes/ms-vscode.cpptools-themes/extension/themes/cpptools_dark_vs.json", "name": "2017 Dark (Visual Studio - C/C++)"}, {"file": "themes/themes/ms-vscode.cpptools-themes/extension/themes/cpptools_light_vs_new.json", "name": "Light (Visual Studio - C/C++)"}, {"file": "themes/themes/ms-vscode.cpptools-themes/extension/themes/cpptools_light_vs.json", "name": "2017 Light (Visual Studio - C/C++)"}], "vsix_path": "./themes/archives/ms-vscode.cpptools-themes.vsix", "theme_dir": "./themes/themes/ms-vscode.cpptools-themes"}, {"categories": ["Themes"], "displayName": "GitHub Theme", "publisher.displayName": "GitHub", "publisher.publisherName": "GitHub", "tags": ["__web_extension", "colorblind", "color-theme", "dark", "github", "light", "protanopia", "theme"], "extension.extensionId": "7328a705-91fc-49e6-8293-da6f112e482d", "extension.extensionName": "github-vscode-theme", "extension.latestVersion": "6.3.4", "extension.downloadUrl": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/GitHub/vsextensions/github-vscode-theme/6.3.4/vspackage", "theme_files": [{"file": "themes/themes/GitHub.github-vscode-theme/extension/themes/light-default.json", "name": "GitHub Light Default"}, {"file": "themes/themes/GitHub.github-vscode-theme/extension/themes/light-high-contrast.json", "name": "GitHub Light High Contrast"}, {"file": "themes/themes/GitHub.github-vscode-theme/extension/themes/light-colorblind.json", "name": "GitHub Light Colorblind (Beta)"}, {"file": "themes/themes/GitHub.github-vscode-theme/extension/themes/dark-default.json", "name": "GitHub Dark Default"}, {"file": "themes/themes/GitHub.github-vscode-theme/extension/themes/dark-high-contrast.json", "name": "GitHub Dark High Contrast"}, {"file": "themes/themes/GitHub.github-vscode-theme/extension/themes/dark-colorblind.json", "name": "GitHub Dark Colorblind (Beta)"}, {"file": "themes/themes/GitHub.github-vscode-theme/extension/themes/dark-dimmed.json", "name": "GitHub Dark Dimmed"}, {"file": "themes/themes/GitHub.github-vscode-theme/extension/themes/light.json", "name": "GitHub Light"}, {"file": "themes/themes/GitHub.github-vscode-theme/extension/themes/dark.json", "name": "GitHub Dark"}], "vsix_path": "./themes/archives/GitHub.github-vscode-theme.vsix", "theme_dir": "./themes/themes/GitHub.github-vscode-theme"}, {"categories": ["Programming Languages", "Snippets", "Themes", "Linters", "Debuggers", "Formatters"], "displayName": "PowerShell", "publisher.displayName": "Microsoft", "publisher.publisherName": "ms-vscode", "tags": ["color-theme", "debuggers", "keybindings", "powershell", "pwsh", "snippet", "theme"], "extension.extensionId": "40d39ce9-c381-47a0-80c8-a6661f731eab", "extension.extensionName": "PowerShell", "extension.latestVersion": "2024.3.2", "extension.downloadUrl": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/ms-vscode/vsextensions/PowerShell/2024.3.2/vspackage", "theme_files": [{"file": "themes/themes/ms-vscode.PowerShell/extension/themes/theme-psise/theme.json", "name": "PowerShell ISE"}], "vsix_path": "./themes/archives/ms-vscode.PowerShell.vsix", "theme_dir": "./themes/themes/ms-vscode.PowerShell"}, {"categories": ["Themes"], "displayName": "One Dark Pro", "publisher.displayName": "binaryify", "publisher.publisherName": "zhuangtongfa", "tags": ["__web_extension", "atom", "color-theme", "one dark", "one dark pro", "OneDark", "onedark pro", "theme"], "extension.extensionId": "26a529c9-2654-4b95-a63f-02f6a52429e6", "extension.extensionName": "Material-theme", "extension.latestVersion": "3.17.3", "extension.downloadUrl": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/zhuangtongfa/vsextensions/Material-theme/3.17.3/vspackage", "theme_files": [{"file": "themes/themes/zhuangtongfa.Material-theme/extension/themes/OneDark-Pro.json", "name": "One Dark Pro"}, {"file": "themes/themes/zhuangtongfa.Material-theme/extension/themes/OneDark-Pro-flat.json", "name": "One Dark Pro Flat"}, {"file": "themes/themes/zhuangtongfa.Material-theme/extension/themes/OneDark-Pro-darker.json", "name": "One Dark Pro Darker"}, {"file": "themes/themes/zhuangtongfa.Material-theme/extension/themes/OneDark-Pro-mix.json", "name": "One Dark Pro Mix"}], "vsix_path": "./themes/archives/zhuangtongfa.Material-theme.vsix", "theme_dir": "./themes/themes/zhuangtongfa.Material-theme"}, {"categories": ["Themes"], "displayName": "Dracula Theme Official", "publisher.displayName": "Dracula Theme", "publisher.publisherName": "dracula-theme", "tags": ["__web_extension", "color-theme", "dark", "dracula", "theme"], "extension.extensionId": "4e44877c-1c8d-4f9c-ba86-1372d0fbeeb1", "extension.extensionName": "theme-dracula", "extension.latestVersion": "2.25.1", "extension.downloadUrl": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/dracula-theme/vsextensions/theme-dracula/2.25.1/vspackage", "theme_files": [{"file": "themes/themes/dracula-theme.theme-dracula/extension/theme/dracula.json", "name": "Dracula Theme"}, {"file": "themes/themes/dracula-theme.theme-dracula/extension/theme/dracula-soft.json", "name": "Dracula Theme Soft"}], "vsix_path": "./themes/archives/dracula-theme.theme-dracula.vsix", "theme_dir": "./themes/themes/dracula-theme.theme-dracula"}, {"categories": ["Themes"], "displayName": "Atom One Dark Theme", "publisher.displayName": "Mahmoud Ali", "publisher.publisherName": "akamud", "tags": ["__sponsor_extension", "__web_extension", "atom", "color-theme", "dark", "one dark", "theme"], "extension.extensionId": "9b2c953d-6ad4-46d1-b18e-7e5992d1d8a6", "extension.extensionName": "vscode-theme-onedark", "extension.latestVersion": "2.3.0", "extension.downloadUrl": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/akamud/vsextensions/vscode-theme-onedark/2.3.0/vspackage", "theme_files": [{"file": "themes/themes/akamud.vscode-theme-onedark/extension/themes/OneDark.json", "name": "Atom One Dark"}], "vsix_path": "./themes/archives/akamud.vscode-theme-onedark.vsix", "theme_dir": "./themes/themes/akamud.vscode-theme-onedark"}, {"categories": ["Themes"], "displayName": "Material Theme", "publisher.displayName": "Equinusocio", "publisher.publisherName": "Equinusocio", "tags": ["__sponsor_extension", "color-theme", "theme", "Themes", "VSCode"], "extension.extensionId": "45bfc9eb-5e03-487f-bffe-315fa6881d6a", "extension.extensionName": "vsc-material-theme", "extension.latestVersion": "34.5.2", "extension.downloadUrl": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Equinusocio/vsextensions/vsc-material-theme/34.5.2/vspackage", "theme_files": [{"file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Default.json", "name": "Material Theme"}, {"file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Default-High-Contrast.json", "name": "Material Theme High Contrast"}, {"file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Darker.json", "name": "Material Theme Darker"}, {"file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Darker-High-Contrast.json", "name": "Material Theme Darker High Contrast"}, {"file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Palenight.json", "name": "Material Theme Palenight"}, {"file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Palenight-High-Contrast.json", "name": "Material Theme Palenight High Contrast"}, {"file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Ocean.json", "name": "Material Theme Ocean"}, {"file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Ocean-High-Contrast.json", "name": "Material Theme Ocean High Contrast"}, {"file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Deepforest.json", "name": "Material Theme Deepforest"}, {"file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Deepforest-High-Contrast.json", "name": "Material Theme DeepForest High Contrast"}, {"file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Lighter.json", "name": "Material Theme Lighter"}, {"file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Lighter-High-Contrast.json", "name": "Material Theme Lighter High Contrast"}], "vsix_path": "./themes/archives/Equinusocio.vsc-material-theme.vsix", "theme_dir": "./themes/themes/Equinusocio.vsc-material-theme"}]
+[
+  {
+    "categories": ["Themes"],
+    "displayName": "C/C++ Themes",
+    "publisher": { "displayName": "Microsoft", "publisherName": "ms-vscode" },
+    "tags": ["__web_extension", "C", "C++", "color-theme", "Microsoft", "Theme", "Themes"],
+    "extension": {
+      "extensionId": "99b17261-8f6e-45f0-9ad5-a69c6f509a4f",
+      "extensionName": "cpptools-themes",
+      "latestVersion": "2.0.0",
+      "downloadUrl": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/ms-vscode/vsextensions/cpptools-themes/2.0.0/vspackage"
+    },
+    "theme_files": [
+      {
+        "file": "themes/themes/ms-vscode.cpptools-themes/extension/themes/cpptools_dark_vs_new.json",
+        "name": "Dark (Visual Studio - C/C++)"
+      },
+      {
+        "file": "themes/themes/ms-vscode.cpptools-themes/extension/themes/cpptools_dark_vs.json",
+        "name": "2017 Dark (Visual Studio - C/C++)"
+      },
+      {
+        "file": "themes/themes/ms-vscode.cpptools-themes/extension/themes/cpptools_light_vs_new.json",
+        "name": "Light (Visual Studio - C/C++)"
+      },
+      {
+        "file": "themes/themes/ms-vscode.cpptools-themes/extension/themes/cpptools_light_vs.json",
+        "name": "2017 Light (Visual Studio - C/C++)"
+      }
+    ],
+    "vsix_path": "./themes/archives/ms-vscode.cpptools-themes.vsix",
+    "theme_dir": "./themes/themes/ms-vscode.cpptools-themes"
+  },
+  {
+    "categories": ["Themes"],
+    "displayName": "GitHub Theme",
+    "publisher": { "displayName": "GitHub", "publisherName": "GitHub" },
+    "tags": ["__web_extension", "colorblind", "color-theme", "dark", "github", "light", "protanopia", "theme"],
+    "extension": {
+      "extensionId": "7328a705-91fc-49e6-8293-da6f112e482d",
+      "extensionName": "github-vscode-theme",
+      "latestVersion": "6.3.4",
+      "downloadUrl": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/GitHub/vsextensions/github-vscode-theme/6.3.4/vspackage"
+    },
+    "theme_files": [
+      {
+        "file": "themes/themes/GitHub.github-vscode-theme/extension/themes/light-default.json",
+        "name": "GitHub Light Default"
+      },
+      {
+        "file": "themes/themes/GitHub.github-vscode-theme/extension/themes/light-high-contrast.json",
+        "name": "GitHub Light High Contrast"
+      },
+      {
+        "file": "themes/themes/GitHub.github-vscode-theme/extension/themes/light-colorblind.json",
+        "name": "GitHub Light Colorblind (Beta)"
+      },
+      {
+        "file": "themes/themes/GitHub.github-vscode-theme/extension/themes/dark-default.json",
+        "name": "GitHub Dark Default"
+      },
+      {
+        "file": "themes/themes/GitHub.github-vscode-theme/extension/themes/dark-high-contrast.json",
+        "name": "GitHub Dark High Contrast"
+      },
+      {
+        "file": "themes/themes/GitHub.github-vscode-theme/extension/themes/dark-colorblind.json",
+        "name": "GitHub Dark Colorblind (Beta)"
+      },
+      {
+        "file": "themes/themes/GitHub.github-vscode-theme/extension/themes/dark-dimmed.json",
+        "name": "GitHub Dark Dimmed"
+      },
+      { "file": "themes/themes/GitHub.github-vscode-theme/extension/themes/light.json", "name": "GitHub Light" },
+      { "file": "themes/themes/GitHub.github-vscode-theme/extension/themes/dark.json", "name": "GitHub Dark" }
+    ],
+    "vsix_path": "./themes/archives/GitHub.github-vscode-theme.vsix",
+    "theme_dir": "./themes/themes/GitHub.github-vscode-theme"
+  },
+  {
+    "categories": ["Programming Languages", "Snippets", "Themes", "Linters", "Debuggers", "Formatters"],
+    "displayName": "PowerShell",
+    "publisher": { "displayName": "Microsoft", "publisherName": "ms-vscode" },
+    "tags": ["color-theme", "debuggers", "keybindings", "powershell", "pwsh", "snippet", "theme"],
+    "extension": {
+      "extensionId": "40d39ce9-c381-47a0-80c8-a6661f731eab",
+      "extensionName": "PowerShell",
+      "latestVersion": "2024.3.2",
+      "downloadUrl": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/ms-vscode/vsextensions/PowerShell/2024.3.2/vspackage"
+    },
+    "theme_files": [
+      { "file": "themes/themes/ms-vscode.PowerShell/extension/themes/theme-psise/theme.json", "name": "PowerShell ISE" }
+    ],
+    "vsix_path": "./themes/archives/ms-vscode.PowerShell.vsix",
+    "theme_dir": "./themes/themes/ms-vscode.PowerShell"
+  },
+  {
+    "categories": ["Themes"],
+    "displayName": "One Dark Pro",
+    "publisher": { "displayName": "binaryify", "publisherName": "zhuangtongfa" },
+    "tags": ["__web_extension", "atom", "color-theme", "one dark", "one dark pro", "OneDark", "onedark pro", "theme"],
+    "extension": {
+      "extensionId": "26a529c9-2654-4b95-a63f-02f6a52429e6",
+      "extensionName": "Material-theme",
+      "latestVersion": "3.17.3",
+      "downloadUrl": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/zhuangtongfa/vsextensions/Material-theme/3.17.3/vspackage"
+    },
+    "theme_files": [
+      { "file": "themes/themes/zhuangtongfa.Material-theme/extension/themes/OneDark-Pro.json", "name": "One Dark Pro" },
+      {
+        "file": "themes/themes/zhuangtongfa.Material-theme/extension/themes/OneDark-Pro-flat.json",
+        "name": "One Dark Pro Flat"
+      },
+      {
+        "file": "themes/themes/zhuangtongfa.Material-theme/extension/themes/OneDark-Pro-darker.json",
+        "name": "One Dark Pro Darker"
+      },
+      {
+        "file": "themes/themes/zhuangtongfa.Material-theme/extension/themes/OneDark-Pro-mix.json",
+        "name": "One Dark Pro Mix"
+      }
+    ],
+    "vsix_path": "./themes/archives/zhuangtongfa.Material-theme.vsix",
+    "theme_dir": "./themes/themes/zhuangtongfa.Material-theme"
+  },
+  {
+    "categories": ["Themes"],
+    "displayName": "Dracula Theme Official",
+    "publisher": { "displayName": "Dracula Theme", "publisherName": "dracula-theme" },
+    "tags": ["__web_extension", "color-theme", "dark", "dracula", "theme"],
+    "extension": {
+      "extensionId": "4e44877c-1c8d-4f9c-ba86-1372d0fbeeb1",
+      "extensionName": "theme-dracula",
+      "latestVersion": "2.25.1",
+      "downloadUrl": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/dracula-theme/vsextensions/theme-dracula/2.25.1/vspackage"
+    },
+    "theme_files": [
+      { "file": "themes/themes/dracula-theme.theme-dracula/extension/theme/dracula.json", "name": "Dracula Theme" },
+      {
+        "file": "themes/themes/dracula-theme.theme-dracula/extension/theme/dracula-soft.json",
+        "name": "Dracula Theme Soft"
+      }
+    ],
+    "vsix_path": "./themes/archives/dracula-theme.theme-dracula.vsix",
+    "theme_dir": "./themes/themes/dracula-theme.theme-dracula"
+  },
+  {
+    "categories": ["Themes"],
+    "displayName": "Atom One Dark Theme",
+    "publisher": { "displayName": "Mahmoud Ali", "publisherName": "akamud" },
+    "tags": ["__sponsor_extension", "__web_extension", "atom", "color-theme", "dark", "one dark", "theme"],
+    "extension": {
+      "extensionId": "9b2c953d-6ad4-46d1-b18e-7e5992d1d8a6",
+      "extensionName": "vscode-theme-onedark",
+      "latestVersion": "2.3.0",
+      "downloadUrl": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/akamud/vsextensions/vscode-theme-onedark/2.3.0/vspackage"
+    },
+    "theme_files": [
+      { "file": "themes/themes/akamud.vscode-theme-onedark/extension/themes/OneDark.json", "name": "Atom One Dark" }
+    ],
+    "vsix_path": "./themes/archives/akamud.vscode-theme-onedark.vsix",
+    "theme_dir": "./themes/themes/akamud.vscode-theme-onedark"
+  },
+  {
+    "categories": ["Themes"],
+    "displayName": "Material Theme",
+    "publisher": { "displayName": "Equinusocio", "publisherName": "Equinusocio" },
+    "tags": ["__sponsor_extension", "color-theme", "theme", "Themes", "VSCode"],
+    "extension": {
+      "extensionId": "45bfc9eb-5e03-487f-bffe-315fa6881d6a",
+      "extensionName": "vsc-material-theme",
+      "latestVersion": "34.5.2",
+      "downloadUrl": "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Equinusocio/vsextensions/vsc-material-theme/34.5.2/vspackage"
+    },
+    "theme_files": [
+      {
+        "file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Default.json",
+        "name": "Material Theme"
+      },
+      {
+        "file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Default-High-Contrast.json",
+        "name": "Material Theme High Contrast"
+      },
+      {
+        "file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Darker.json",
+        "name": "Material Theme Darker"
+      },
+      {
+        "file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Darker-High-Contrast.json",
+        "name": "Material Theme Darker High Contrast"
+      },
+      {
+        "file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Palenight.json",
+        "name": "Material Theme Palenight"
+      },
+      {
+        "file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Palenight-High-Contrast.json",
+        "name": "Material Theme Palenight High Contrast"
+      },
+      {
+        "file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Ocean.json",
+        "name": "Material Theme Ocean"
+      },
+      {
+        "file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Ocean-High-Contrast.json",
+        "name": "Material Theme Ocean High Contrast"
+      },
+      {
+        "file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Deepforest.json",
+        "name": "Material Theme Deepforest"
+      },
+      {
+        "file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Deepforest-High-Contrast.json",
+        "name": "Material Theme DeepForest High Contrast"
+      },
+      {
+        "file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Lighter.json",
+        "name": "Material Theme Lighter"
+      },
+      {
+        "file": "themes/themes/Equinusocio.vsc-material-theme/extension/build/themes/Material-Theme-Lighter-High-Contrast.json",
+        "name": "Material Theme Lighter High Contrast"
+      }
+    ],
+    "vsix_path": "./themes/archives/Equinusocio.vsc-material-theme.vsix",
+    "theme_dir": "./themes/themes/Equinusocio.vsc-material-theme"
+  }
+]

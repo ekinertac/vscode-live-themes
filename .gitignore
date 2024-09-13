@@ -7,7 +7,7 @@ venv
 
 server/themes/archives/*
 server/themes/themes/*
-list.json
+server/themes/list.json
 
 !.gitkeep
 

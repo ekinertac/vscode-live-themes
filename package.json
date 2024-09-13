@@ -4,7 +4,7 @@
   "description": "Test marketplace themes without installing them",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.93.0"
+    "vscode": "^1.90.0"
   },
   "categories": [
     "Other"
@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "live-themes.helloWorld",
-        "title": "Hello World"
+        "command": "live-themes.logToConsole",
+        "title": "Live Themes: Log to Console"
       }
     ]
   },
@@ -34,16 +34,21 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.93.0",
     "@types/mocha": "^10.0.7",
     "@types/node": "20.x",
+    "@types/sinon": "^10.0.20",
+    "@types/vscode": "^1.90.0",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.11.0",
-    "eslint": "^8.57.0",
-    "esbuild": "^0.21.5",
-    "npm-run-all": "^4.1.5",
-    "typescript": "^5.4.5",
     "@vscode/test-cli": "^0.0.9",
-    "@vscode/test-electron": "^2.4.0"
+    "@vscode/test-electron": "^2.4.0",
+    "axios": "^1.7.7",
+    "esbuild": "^0.21.5",
+    "eslint": "^8.57.0",
+    "jsonc-parser": "^3.3.1",
+    "npm-run-all": "^4.1.5",
+    "sinon": "^19.0.0",
+    "strip-json-comments": "^5.0.1",
+    "typescript": "^5.4.5"
   }
 }
