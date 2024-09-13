@@ -586,6 +586,18 @@ def main():
         default="INFO",
         help="Set the logging level",
     )
+    parser.add_argument(
+        "--page-size",
+        type=int,
+        default=10,
+        help="Number of themes to fetch per page. (Default: 10)",
+    )
+    parser.add_argument(
+        "--max-pages",
+        type=int,
+        default=1,
+        help="Maximum number of pages to fetch. (Default: 1)",
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     subparsers.add_parser(
@@ -603,7 +615,7 @@ def main():
 
     setup_logger(args.log_level)
 
-    manager = create_manager()
+    manager = create_manager(page_size=args.page_size, max_pages=args.max_pages)
     run_command(manager, args.command)
 
 
