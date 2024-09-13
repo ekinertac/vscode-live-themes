@@ -523,6 +523,43 @@ class ThemeManager:
                     shutil.rmtree(item_path)
         logging.info("Themes directory cleared successfully.")
 
+    def cleanup(self) -> None:
+        # get all theme files from list.json
+        themes = self.get_themes()
+        theme_files = []
+        for theme in themes:
+            theme_file_list = theme.get("theme_files", [])
+            package_json_path = os.path.join(
+                theme.get("theme_dir", ""), "extension", "package.json"
+            ).lstrip("./")
+            theme_files.append(package_json_path)
+            for theme_file in theme_file_list:
+                theme_files.append(theme_file.get("file", ""))
+
+        # print(json.dumps(theme_files, indent=2))
+
+        # delete all files and folder in themes that are not in theme_files
+        delete_files = []
+
+        for root, dirs, files in os.walk("themes/themes"):
+            for file in files:
+                if file not in theme_files:
+                    delete_files.append(os.path.join(root, file))
+
+        # subtract theme_files from delete_files
+        delete_files = [file for file in delete_files if file not in theme_files]
+
+        for delete_file in delete_files:
+            if os.path.exists(delete_file):
+                os.remove(delete_file)
+
+        # walk recursively in folders in themes and delete empty folders
+        for root, dirs, files in os.walk("themes/themes"):
+            for dir in dirs:
+                dir_path = os.path.join(root, dir)
+                if os.path.isdir(dir_path) and not os.listdir(dir_path):
+                    os.rmdir(dir_path)
+
 
 def create_manager(
     fetcher_class=VSCodeThemeFetcher,
@@ -583,6 +620,8 @@ def run_command(manager: ThemeManager, command: str) -> None:
         manager.clear_themes()
         manager.fetch_and_save_themes()
         manager.download_themes()
+    elif command == "cleanup":
+        manager.cleanup()
 
 
 def main():
@@ -618,6 +657,7 @@ def main():
     subparsers.add_parser("clear_metadata", help="Clear the metadata file")
     subparsers.add_parser("clear_cache", help="Clear the cache")
     subparsers.add_parser("clear_all", help="Clear the metadata, cache, and themes")
+    subparsers.add_parser("cleanup", help="Cleanup the themes directory")
 
     args = parser.parse_args()
 
