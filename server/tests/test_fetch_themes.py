@@ -163,7 +163,7 @@ class TestVSCodeThemeDownloader:
         mock_exists.return_value = False
         downloader._extract_vsix("test.vsix", "test_dir")
         mock_zipfile.assert_called_once_with("test.vsix", "r")
-        mock_zipfile().extractall.assert_called_once_with("test_dir")
+        mock_zipfile().__enter__().extractall.assert_called_once_with("test_dir")
 
     @patch("fetch_themes.os.path.exists")
     @patch(

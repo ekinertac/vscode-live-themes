@@ -1,6 +1,6 @@
 import os
 import time
-from typing import Any, List, Dict
+from typing import Any, List, Dict, Optional
 import requests
 import argparse
 from abc import ABC, abstractmethod
@@ -8,11 +8,13 @@ import zipfile
 import commentjson
 import json
 import logging
+import shutil
 
 
 # Add this at the beginning of the file
 def setup_logger(level: str = "INFO") -> None:
-    """Set up the logger with the specified level.
+    """
+    Set up the logger with the specified level.
 
     Args:
         level (str): The logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL, or NONE).
@@ -33,7 +35,8 @@ class ThemeDownloader(ABC):
 
     @abstractmethod
     def download(self, theme: Dict[str, Any]) -> Dict[str, Any]:
-        """Download a theme.
+        """
+        Download a theme.
 
         Args:
             theme (Dict[str, Any]): A dictionary containing theme information.
@@ -55,7 +58,8 @@ class ThemeStorage(ABC):
 
     @abstractmethod
     def save(self, themes: List[Dict[str, Any]]) -> None:
-        """Save themes to storage.
+        """
+        Save themes to storage.
 
         Args:
             themes (List[Dict[str, Any]]): A list of theme dictionaries to save.
@@ -64,7 +68,8 @@ class ThemeStorage(ABC):
 
     @abstractmethod
     def load(self) -> List[Dict[str, Any]]:
-        """Load themes from storage.
+        """
+        Load themes from storage.
 
         Returns:
             List[Dict[str, Any]]: A list of theme dictionaries.
@@ -76,7 +81,8 @@ class VSCodeThemeFetcher(ThemeFetcher):
     """Fetches themes from the Visual Studio Code Marketplace."""
 
     def __init__(self, page_size: int = 54, max_pages: int = 10) -> None:
-        """Initialize the VSCodeThemeFetcher.
+        """
+        Initialize the VSCodeThemeFetcher.
 
         Args:
             page_size (int): Number of themes to fetch per page.
@@ -86,7 +92,8 @@ class VSCodeThemeFetcher(ThemeFetcher):
         self.max_pages = max_pages
 
     def fetch(self) -> List[Dict[str, Any]]:
-        """Fetch themes from the VS Code Marketplace.
+        """
+        Fetch themes from the VS Code Marketplace.
 
         Returns:
             List[Dict[str, Any]]: A list of theme dictionaries.
@@ -100,7 +107,8 @@ class VSCodeThemeFetcher(ThemeFetcher):
         return all_themes
 
     def _post_data(self, page_number: int) -> Dict[str, Any]:
-        """Generate the POST data for the VS Code Marketplace API request.
+        """
+        Generate the POST data for the VS Code Marketplace API request.
 
         Args:
             page_number (int): The current page number.
@@ -137,7 +145,8 @@ class VSCodeThemeFetcher(ThemeFetcher):
         }
 
     def _get_vscode_themes(self, page_size: int, page_number: int) -> Dict[str, Any]:
-        """Fetch themes from the VS Code Marketplace API.
+        """
+        Fetch themes from the VS Code Marketplace API.
 
         Args:
             page_size (int): Number of themes to fetch per page.
@@ -160,7 +169,8 @@ class VSCodeThemeFetcher(ThemeFetcher):
     def _get_download_url(
         self, publisherName: str, extensionName: str, version: str
     ) -> str:
-        """Generate the download URL for a VS Code extension.
+        """
+        Generate the download URL for a VS Code extension.
 
         Args:
             publisherName (str): The name of the extension publisher.
@@ -173,7 +183,8 @@ class VSCodeThemeFetcher(ThemeFetcher):
         return f"https://marketplace.visualstudio.com/_apis/public/gallery/publishers/{publisherName}/vsextensions/{extensionName}/{version}/vspackage"
 
     def _build_theme_list(self, results: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Build a list of themes from the API results.
+        """
+        Build a list of themes from the API results.
 
         Args:
             results (Dict[str, Any]): The API response containing theme data.
@@ -219,7 +230,8 @@ class JSONThemeStorage(ThemeStorage):
     """Stores themes in a JSON file."""
 
     def __init__(self, file_path: str):
-        """Initialize the JSONThemeStorage.
+        """
+        Initialize the JSONThemeStorage.
 
         Args:
             file_path (str): The path to the JSON file for storing themes.
@@ -227,17 +239,19 @@ class JSONThemeStorage(ThemeStorage):
         self.file_path = file_path
 
     def save(self, themes: List[Dict[str, Any]]) -> None:
-        """Save themes to a JSON file.
+        """
+        Save themes to a JSON file.
 
         Args:
             themes (List[Dict[str, Any]]): A list of theme dictionaries to save.
         """
         os.makedirs(os.path.dirname(self.file_path), exist_ok=True)
         with open(self.file_path, "w") as file:
-            json.dump(themes, file, indent=2)
+            json.dump(themes, file)
 
     def load(self) -> List[Dict[str, Any]]:
-        """Load themes from a JSON file.
+        """
+        Load themes from a JSON file.
 
         Returns:
             List[Dict[str, Any]]: A list of theme dictionaries.
@@ -256,7 +270,8 @@ class VSCodeThemeDownloader(ThemeDownloader):
         themes_dir: str = "./themes/themes",
         archives_dir: str = "./themes/archives",
     ):
-        """Initialize the VSCodeThemeDownloader.
+        """
+        Initialize the VSCodeThemeDownloader.
 
         Args:
             themes_dir (str): The directory to store extracted themes.
@@ -266,7 +281,8 @@ class VSCodeThemeDownloader(ThemeDownloader):
         self.archives_dir = archives_dir
 
     def download(self, theme: Dict[str, Any]) -> Dict[str, Any]:
-        """Download and process a VS Code theme.
+        """
+        Download and process a VS Code theme.
 
         Args:
             theme (Dict[str, Any]): A dictionary containing theme information.
@@ -304,7 +320,8 @@ class VSCodeThemeDownloader(ThemeDownloader):
         return updated_theme
 
     def _create_theme_dir(self, publisher_name: str, extension_name: str) -> str:
-        """Create a directory for storing the theme.
+        """
+        Create a directory for storing the theme.
 
         Args:
             publisher_name (str): The name of the theme publisher.
@@ -320,7 +337,8 @@ class VSCodeThemeDownloader(ThemeDownloader):
     def _download_vsix(
         self, publisher_name: str, extension_name: str, download_url: str
     ) -> str:
-        """Download the VSIX file for a theme.
+        """
+        Download the VSIX file for a theme.
 
         Args:
             publisher_name (str): The name of the theme publisher.
@@ -346,7 +364,8 @@ class VSCodeThemeDownloader(ThemeDownloader):
         return vsix_path
 
     def _extract_vsix(self, vsix_path: str, theme_dir: str) -> None:
-        """Extract the contents of a VSIX file.
+        """
+        Extract the contents of a VSIX file.
 
         Args:
             vsix_path (str): The path to the VSIX file.
@@ -357,7 +376,8 @@ class VSCodeThemeDownloader(ThemeDownloader):
         logging.info(f"Extracted: {vsix_path}")
 
     def _get_theme_info(self, theme_dir: str) -> List[Dict[str, str]]:
-        """Get theme information from the package.json file.
+        """
+        Get theme information from the package.json file.
 
         Args:
             theme_dir (str): The directory containing the extracted theme.
@@ -366,46 +386,62 @@ class VSCodeThemeDownloader(ThemeDownloader):
             List[Dict[str, str]]: A list of dictionaries containing theme file information.
         """
         package_json_path = os.path.join(theme_dir, "extension", "package.json")
-        theme_files = []
-
         logging.debug(f"Checking package.json: {package_json_path}")
 
-        if os.path.exists(package_json_path):
-            try:
-                with open(package_json_path, "r") as f:
-                    package_data = json.load(f)
-
-                if (
-                    "contributes" in package_data
-                    and "themes" in package_data["contributes"]
-                ):
-                    for theme in package_data["contributes"]["themes"]:
-                        relative_theme_path = theme["path"]
-                        full_theme_path = os.path.join(
-                            theme_dir, "extension", relative_theme_path
-                        )
-                        theme_name = theme.get(
-                            "label",
-                            os.path.splitext(os.path.basename(relative_theme_path))[0],
-                        )
-
-                        if os.path.exists(full_theme_path):
-                            theme_files.append(
-                                {"file": relative_theme_path, "name": theme_name}
-                            )
-                            logging.debug(f"Added theme: {theme_name}")
-                        else:
-                            logging.warning(f"Theme file not found: {full_theme_path}")
-                else:
-                    logging.warning("No themes found in package.json")
-            except json.JSONDecodeError as e:
-                logging.error(f"Error parsing package.json: {str(e)}")
-            except Exception as e:
-                logging.error(f"Error reading package.json: {str(e)}")
-        else:
+        if not os.path.exists(package_json_path):
             logging.warning(f"package.json not found: {package_json_path}")
+            return []
+
+        try:
+            with open(package_json_path, "r") as f:
+                package_data = json.load(f)
+        except json.JSONDecodeError as e:
+            logging.error(f"Error parsing package.json: {str(e)}")
+            return []
+        except Exception as e:
+            logging.error(f"Error reading package.json: {str(e)}")
+            return []
+
+        if (
+            "contributes" not in package_data
+            or "themes" not in package_data["contributes"]
+        ):
+            logging.warning("No themes found in package.json")
+            return []
+
+        theme_files = []
+        for theme in package_data["contributes"]["themes"]:
+            theme_info = self._process_theme(theme_dir, theme)
+            if theme_info:
+                theme_files.append(theme_info)
 
         return theme_files
+
+    def _process_theme(
+        self, theme_dir: str, theme: Dict[str, Any]
+    ) -> Optional[Dict[str, str]]:
+        """
+        Process a single theme entry from package.json
+
+        Args:
+            theme_dir (str): The directory containing the extracted theme.
+            theme (Dict[str, Any]): A theme entry from package.json
+
+        Returns:
+            Optional[Dict[str, str]]: A dictionary containing theme file information, or None if invalid.
+        """
+        relative_theme_path = theme["path"]
+        full_theme_path = os.path.join(theme_dir, "extension", relative_theme_path)
+        theme_name = theme.get(
+            "label", os.path.splitext(os.path.basename(relative_theme_path))[0]
+        )
+
+        if not os.path.exists(full_theme_path):
+            logging.warning(f"Theme file not found: {full_theme_path}")
+            return None
+
+        logging.debug(f"Added theme: {theme_name}")
+        return {"file": relative_theme_path, "name": theme_name}
 
 
 class ThemeManager:
@@ -414,7 +450,8 @@ class ThemeManager:
     def __init__(
         self, fetcher: ThemeFetcher, storage: ThemeStorage, downloader: ThemeDownloader
     ):
-        """Initialize the ThemeManager.
+        """
+        Initialize the ThemeManager.
 
         Args:
             fetcher (ThemeFetcher): An instance of a ThemeFetcher.
@@ -431,7 +468,8 @@ class ThemeManager:
         self.storage.save(themes)
 
     def get_themes(self) -> List[Dict[str, Any]]:
-        """Get themes from storage.
+        """
+        Get themes from storage.
 
         Returns:
             List[Dict[str, Any]]: A list of theme dictionaries.
@@ -458,6 +496,25 @@ class ThemeManager:
         with open(path, "w") as file:
             commentjson.dump([], file)
 
+    def clear_archives(self) -> None:
+        """Clear the theme cache."""
+        path = "themes/archives"
+        for file in os.listdir(path):
+            if file != ".gitkeep":
+                os.remove(os.path.join(path, file))
+
+    def clear_themes(self) -> None:
+        """Clear the folders in the theme directory."""
+        path = "themes/themes"
+        for item in os.listdir(path):
+            item_path = os.path.join(path, item)
+            if item != ".gitkeep":
+                if os.path.isfile(item_path):
+                    os.remove(item_path)
+                elif os.path.isdir(item_path):
+                    shutil.rmtree(item_path)
+        logging.info("Themes directory cleared successfully.")
+
 
 def create_manager(
     fetcher_class=VSCodeThemeFetcher,
@@ -469,7 +526,8 @@ def create_manager(
     themes_dir="./themes/themes",
     archives_dir="./themes/archives",
 ) -> ThemeManager:
-    """Create and configure a ThemeManager instance.
+    """
+    Create and configure a ThemeManager instance.
 
     Args:
         fetcher_class: The class to use for fetching themes.
@@ -491,7 +549,8 @@ def create_manager(
 
 
 def run_command(manager: ThemeManager, command: str) -> None:
-    """Run a command using the ThemeManager.
+    """
+    Run a command using the ThemeManager.
 
     Args:
         manager (ThemeManager): The ThemeManager instance.
@@ -499,18 +558,21 @@ def run_command(manager: ThemeManager, command: str) -> None:
     """
     if command == "metadata":
         manager.fetch_and_save_themes()
-        # count = len(manager.get_themes())
-        # print(f"{count} themes fetched and saved successfully.")
-
     elif command == "download":
         manager.download_themes()
-
     elif command == "all":
         manager.clear_metadata()
         manager.fetch_and_save_themes()
         manager.download_themes()
-        # count = len(manager.get_themes())
-        # print(f"{count} themes downloaded and extracted successfully.")
+    elif command == "clear_metadata":
+        manager.clear_metadata()
+    elif command == "clear_cache":
+        manager.clear_archives()
+        manager.clear_themes()
+    elif command == "clear_all":
+        manager.clear_metadata()
+        manager.clear_archives()
+        manager.clear_themes()
 
 
 def main():
@@ -531,6 +593,9 @@ def main():
         "download", help="Download and extract themes based on the fetched metadata"
     )
     subparsers.add_parser("all", help="Fetch metadata and download all themes")
+    subparsers.add_parser("clear_metadata", help="Clear the metadata file")
+    subparsers.add_parser("clear_cache", help="Clear the cache")
+    subparsers.add_parser("clear_all", help="Clear the metadata, cache, and themes")
 
     args = parser.parse_args()
 
