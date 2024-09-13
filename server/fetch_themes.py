@@ -620,6 +620,7 @@ def run_command(manager: ThemeManager, command: str) -> None:
         manager.clear_themes()
         manager.fetch_and_save_themes()
         manager.download_themes()
+        manager.cleanup()
     elif command == "cleanup":
         manager.cleanup()
 
