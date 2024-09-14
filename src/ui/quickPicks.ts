@@ -20,7 +20,7 @@ export function createFileQuickPick(theme: Theme): vscode.QuickPick<vscode.Quick
   const goBackItem = { label: '$(arrow-left) Go Back', description: '  Return to theme selection' };
   quickPick.items = [
     goBackItem,
-    ...theme.theme_files.map((file: ThemeFile) => ({
+    ...(theme.theme_files || []).map((file: ThemeFile) => ({
       label: file.name,
       description: file.file,
     })),

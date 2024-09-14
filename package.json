@@ -88,5 +88,8 @@
     "sinon": "^19.0.0",
     "strip-json-comments": "^5.0.1",
     "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@sentry/node": "^8.30.0"
   }
 }

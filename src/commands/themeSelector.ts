@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as Sentry from '@sentry/node';
 import { ThemeQuickPickItem } from '../types';
 import { getThemes, fetchThemeFile } from '../services/themeService';
 import { restoreOriginalConfigurations, updateConfigurations } from '../services/configurationService';
@@ -6,8 +7,6 @@ import { createThemeQuickPick, createFileQuickPick } from '../ui/quickPicks';
 
 export function registerThemeSelectorCommand(context: vscode.ExtensionContext): vscode.Disposable {
   return vscode.commands.registerCommand('live-themes.logToConsole', async () => {
-    console.log('[Live Themes] Hello from Live Themes extension!');
-
     try {
       const themes = await getThemes(context);
       const themeQuickPick = createThemeQuickPick(themes);
@@ -15,7 +14,7 @@ export function registerThemeSelectorCommand(context: vscode.ExtensionContext): 
       themeQuickPick.onDidChangeActive(async (items) => {
         if (items.length > 0) {
           const activeItem = items[0];
-          console.log(`Active item changed: ${activeItem.label}`);
+          console.log(`[Live Themes] Active item changed: ${activeItem.label}`);
 
           themeQuickPick.busy = true;
           try {
@@ -25,7 +24,8 @@ export function registerThemeSelectorCommand(context: vscode.ExtensionContext): 
               await updateConfigurations(themeContent);
             }
           } catch (error) {
-            console.error('Error fetching theme file:', error);
+            console.error('[Live Themes] Error fetching theme file:', error);
+            Sentry.captureException(error);
             restoreOriginalConfigurations();
           } finally {
             themeQuickPick.busy = false;
@@ -46,14 +46,15 @@ export function registerThemeSelectorCommand(context: vscode.ExtensionContext): 
           fileQuickPick.onDidChangeActive(async (items) => {
             if (items.length > 0 && items[0].label !== '$(arrow-left) Go Back') {
               const activeItem = items[0];
-              console.log(`Active theme file changed: ${activeItem.label}`);
+              console.log(`[Live Themes] Active theme file changed: ${activeItem.label}`);
 
               fileQuickPick.busy = true;
               try {
                 const themeContent = await fetchThemeFile(activeItem.description || '');
                 await updateConfigurations(themeContent);
               } catch (error) {
-                console.error('Error fetching theme file:', error);
+                console.error('[Live Themes] Error fetching theme file:', error);
+                Sentry.captureException(error);
                 restoreOriginalConfigurations();
               } finally {
                 fileQuickPick.busy = false;
@@ -89,7 +90,8 @@ export function registerThemeSelectorCommand(context: vscode.ExtensionContext): 
 
       themeQuickPick.show();
     } catch (error) {
-      console.error('An error occurred in the extension:', error);
+      Sentry.captureException(error);
+      console.error('[Live Themes] An error occurred in the extension:', error);
       restoreOriginalConfigurations();
       vscode.window.showErrorMessage(
         'An error occurred in the Live Themes extension. Original configurations have been restored.',

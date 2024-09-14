@@ -9,6 +9,16 @@ import commentjson
 import json
 import logging
 import shutil
+from enum import Enum
+import tempfile
+from tqdm import tqdm
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://a7f5a48af43cecc6ed10281e52b0ebcb@o352105.ingest.us.sentry.io/4507953095245824",
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+)
 
 
 # Add this at the beginning of the file
@@ -77,19 +87,36 @@ class ThemeStorage(ABC):
         pass
 
 
+class ThemeSortOption(Enum):
+    MostInstalled = 4
+    ByName = 2
+    PublishedDate = 10
+    Publisher = 3
+    ByRating = 12
+    TrendingWeekly = 8
+    UpdateDate = 1
+
+
 class VSCodeThemeFetcher(ThemeFetcher):
     """Fetches themes from the Visual Studio Code Marketplace."""
 
-    def __init__(self, page_size: int = 54, max_pages: int = 10) -> None:
+    def __init__(
+        self,
+        page_size: int = 54,
+        max_pages: int = 10,
+        sort_option: ThemeSortOption = ThemeSortOption.MostInstalled,
+    ) -> None:
         """
         Initialize the VSCodeThemeFetcher.
 
         Args:
             page_size (int): Number of themes to fetch per page.
             max_pages (int): Maximum number of pages to fetch.
+            sort_option (ThemeSortOption): Sorting option for themes.
         """
         self.page_size = page_size
         self.max_pages = max_pages
+        self.sort_option = sort_option
 
     def fetch(self) -> List[Dict[str, Any]]:
         """
@@ -136,7 +163,7 @@ class VSCodeThemeFetcher(ThemeFetcher):
                     "direction": 2,
                     "pageSize": self.page_size,
                     "pageNumber": page_number,
-                    "sortBy": 4,
+                    "sortBy": self.sort_option.value,
                     "sortOrder": 0,
                     "pagingToken": None,
                 }
@@ -234,37 +261,64 @@ class VSCodeThemeFetcher(ThemeFetcher):
 class JSONThemeStorage(ThemeStorage):
     """Stores themes in a JSON file."""
 
-    def __init__(self, file_path: str):
+    def __init__(self, base_path: str):
         """
         Initialize the JSONThemeStorage.
 
         Args:
-            file_path (str): The path to the JSON file for storing themes.
+            base_path (str): The base path for storing theme JSON files.
         """
-        self.file_path = file_path
+        self.base_path = base_path
 
-    def save(self, themes: List[Dict[str, Any]]) -> None:
+    def save(self, themes: List[Dict[str, Any]], sort_option: ThemeSortOption) -> None:
         """
         Save themes to a JSON file.
 
         Args:
             themes (List[Dict[str, Any]]): A list of theme dictionaries to save.
+            sort_option (ThemeSortOption): Sorting option for themes.
         """
-        os.makedirs(os.path.dirname(self.file_path), exist_ok=True)
-        with open(self.file_path, "w") as file:
-            json.dump(themes, file)
+        file_name = f"{sort_option.name.lower()}.json"
+        temp_file = tempfile.NamedTemporaryFile(
+            mode="w", delete=False, dir=self.base_path, prefix=f"temp_{file_name}"
+        )
+        try:
+            json.dump(themes, temp_file)
+            temp_file.close()
+            final_path = os.path.join(self.base_path, file_name)
+            os.replace(temp_file.name, final_path)
+        except Exception as e:
+            os.unlink(temp_file.name)
+            raise e
 
-    def load(self) -> List[Dict[str, Any]]:
+    def load(self, sort_option: ThemeSortOption) -> List[Dict[str, Any]]:
         """
         Load themes from a JSON file.
+
+        Args:
+            sort_option (ThemeSortOption): Sorting option for themes.
 
         Returns:
             List[Dict[str, Any]]: A list of theme dictionaries.
         """
-        if not os.path.exists(self.file_path):
+        file_name = f"{sort_option.name.lower()}.json"
+        file_path = os.path.join(self.base_path, file_name)
+        if not os.path.exists(file_path):
             return []
-        with open(self.file_path, "r") as file:
+        with open(file_path, "r") as file:
             return commentjson.load(file)
+
+    def load_all(self) -> Dict[str, List[Dict[str, Any]]]:
+        """
+        Load themes from all JSON files.
+
+        Returns:
+            Dict[str, List[Dict[str, Any]]]: A dictionary of theme lists for each sort option.
+        """
+        all_themes = {}
+        for sort_option in ThemeSortOption:
+            all_themes[sort_option.name] = self.load(sort_option)
+        return all_themes
 
 
 class VSCodeThemeDownloader(ThemeDownloader):
@@ -285,62 +339,12 @@ class VSCodeThemeDownloader(ThemeDownloader):
         self.themes_dir = themes_dir
         self.archives_dir = archives_dir
 
-    def download(self, theme: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Download and process a VS Code theme.
-
-        Args:
-            theme (Dict[str, Any]): A dictionary containing theme information.
-
-        Returns:
-            Dict[str, Any]: An updated theme dictionary with download information.
-        """
-        publisher_name = theme["publisher"]["publisherName"]
-        extension_name = theme["extension"]["extensionName"]
-        download_url = theme["extension"]["downloadUrl"]
-
-        logging.info(f"Processing theme: {publisher_name}.{extension_name}")
-
-        theme_dir = self._create_theme_dir(publisher_name, extension_name)
-        vsix_path = self._download_vsix(publisher_name, extension_name, download_url)
-        self._extract_vsix(vsix_path, theme_dir)
-        theme_files = self._get_theme_info(theme_dir)
-
-        if not theme_files:
-            logging.warning(
-                f"No theme files found for: {publisher_name}.{extension_name}"
-            )
-            return None
-
-        updated_theme = theme.copy()
-        updated_theme.update(
-            {
-                "theme_files": theme_files,
-                "vsix_path": vsix_path,
-                "theme_dir": theme_dir,
-            }
-        )
-
-        logging.info(f"Successfully processed theme: {publisher_name}.{extension_name}")
-        return updated_theme
-
-    def _create_theme_dir(self, publisher_name: str, extension_name: str) -> str:
-        """
-        Create a directory for storing the theme.
-
-        Args:
-            publisher_name (str): The name of the theme publisher.
-            extension_name (str): The name of the theme extension.
-
-        Returns:
-            str: The path to the created theme directory.
-        """
-        theme_dir = f"{self.themes_dir}/{publisher_name}.{extension_name}"
-        os.makedirs(theme_dir, exist_ok=True)
-        return theme_dir
+        # Create the archives directory if it doesn't exist
+        os.makedirs(self.archives_dir, exist_ok=True)
+        os.makedirs(self.themes_dir, exist_ok=True)
 
     def _download_vsix(
-        self, publisher_name: str, extension_name: str, download_url: str
+        self, publisher_name: str, extension_name: str, version: str, download_url: str
     ) -> str:
         """
         Download the VSIX file for a theme.
@@ -348,37 +352,118 @@ class VSCodeThemeDownloader(ThemeDownloader):
         Args:
             publisher_name (str): The name of the theme publisher.
             extension_name (str): The name of the theme extension.
+            version (str): The version of the theme.
             download_url (str): The URL to download the VSIX file.
 
         Returns:
             str: The path to the downloaded VSIX file.
         """
-        os.makedirs(self.archives_dir, exist_ok=True)
-        vsix_path = f"{self.archives_dir}/{publisher_name}.{extension_name}.vsix"
+        vsix_path = os.path.join(
+            self.archives_dir, f"{publisher_name}.{extension_name}.{version}.vsix"
+        )
 
         if not os.path.exists(vsix_path):
-            response = requests.get(download_url)
-            with open(vsix_path, "wb") as f:
-                f.write(response.content)
-            logging.info(f"Downloaded: {publisher_name}.{extension_name}")
+            try:
+                response = requests.get(download_url, timeout=30)
+                response.raise_for_status()  # Raise an exception for bad status codes
+                with open(vsix_path, "wb") as f:
+                    f.write(response.content)
+                logging.info(
+                    f"Downloaded: {publisher_name}.{extension_name} (version {version})"
+                )
+            except requests.exceptions.RequestException as e:
+                logging.error(f"Error downloading VSIX: {str(e)}")
+                raise
         else:
             logging.debug(
-                f"Skipped download (file exists): {publisher_name}.{extension_name}"
+                f"Skipped download (file exists): {publisher_name}.{extension_name} (version {version})"
             )
 
         return vsix_path
 
-    def _extract_vsix(self, vsix_path: str, theme_dir: str) -> None:
+    def download(self, theme: Dict[str, Any], force: bool = False) -> Dict[str, Any]:
+        publisher_name = theme["publisher"]["publisherName"]
+        extension_name = theme["extension"]["extensionName"]
+        version = theme["extension"]["latestVersion"]
+        download_url = theme["extension"]["downloadUrl"]
+
+        vsix_path = os.path.join(
+            self.archives_dir, f"{publisher_name}.{extension_name}.{version}.vsix"
+        )
+
+        if os.path.exists(vsix_path) and not force:
+            logging.info(
+                f"Theme archive already exists: {publisher_name}.{extension_name} (version {version})"
+            )
+        else:
+            logging.info(f"Downloading theme: {publisher_name}.{extension_name}")
+            try:
+                vsix_path = self._download_vsix(
+                    publisher_name, extension_name, version, download_url
+                )
+            except Exception as e:
+                logging.error(f"Error downloading theme: {str(e)}")
+                return theme  # Return original theme if download fails
+
+        theme_dir = self._extract_vsix(
+            vsix_path, publisher_name, extension_name, version
+        )
+
+        if not theme_dir:
+            logging.error(f"Failed to extract theme: {publisher_name}.{extension_name}")
+            return theme
+
+        # Delete the VSIX file after successful extraction
+        os.remove(vsix_path)
+        logging.info(f"Deleted VSIX file: {vsix_path}")
+
+        theme_files = self._get_theme_info(theme_dir)
+        if not theme_files:
+            logging.warning(
+                f"No theme files found for: {publisher_name}.{extension_name}"
+            )
+
+        updated_theme = theme.copy()
+        updated_theme.update(
+            {
+                "theme_files": theme_files,
+                "theme_dir": theme_dir,
+            }
+        )
+
+        return updated_theme
+
+    def _extract_vsix(
+        self, vsix_path: str, publisher_name: str, extension_name: str, version: str
+    ) -> Optional[str]:
         """
         Extract the contents of a VSIX file.
 
         Args:
             vsix_path (str): The path to the VSIX file.
-            theme_dir (str): The directory to extract the contents to.
+            publisher_name (str): The name of the theme publisher.
+            extension_name (str): The name of the theme extension.
+            version (str): The version of the theme.
+
+        Returns:
+            Optional[str]: The path to the extracted theme directory, or None if extraction failed.
         """
-        with zipfile.ZipFile(vsix_path, "r") as zip_ref:
-            zip_ref.extractall(theme_dir)
-        logging.info(f"Extracted: {vsix_path}")
+        theme_dir = os.path.join(
+            self.themes_dir, f"{publisher_name}.{extension_name}", version
+        )
+        try:
+            with zipfile.ZipFile(vsix_path, "r") as zip_ref:
+                zip_ref.extractall(theme_dir)
+            logging.info(f"Extracted: {vsix_path} to {theme_dir}")
+            return theme_dir
+        except zipfile.BadZipFile:
+            logging.error(
+                f"Error extracting VSIX file: {vsix_path} is not a valid zip file"
+            )
+        except Exception as e:
+            logging.error(f"Error extracting VSIX file: {str(e)}")
+
+        return None
 
     def _get_theme_info(self, theme_dir: str) -> List[Dict[str, str]]:
         """
@@ -461,7 +546,11 @@ class ThemeManager:
     """Manages the process of fetching, storing, and downloading themes."""
 
     def __init__(
-        self, fetcher: ThemeFetcher, storage: ThemeStorage, downloader: ThemeDownloader
+        self,
+        fetcher: ThemeFetcher,
+        storage: ThemeStorage,
+        downloader: ThemeDownloader,
+        sort_option: ThemeSortOption,
     ):
         """
         Initialize the ThemeManager.
@@ -470,15 +559,17 @@ class ThemeManager:
             fetcher (ThemeFetcher): An instance of a ThemeFetcher.
             storage (ThemeStorage): An instance of a ThemeStorage.
             downloader (ThemeDownloader): An instance of a ThemeDownloader.
+            sort_option (ThemeSortOption): Sorting option for themes.
         """
         self.fetcher = fetcher
         self.storage = storage
         self.downloader = downloader
+        self.sort_option = sort_option
 
     def fetch_and_save_themes(self) -> None:
         """Fetch themes and save them to storage."""
         themes = self.fetcher.fetch()
-        self.storage.save(themes)
+        self.storage.save(themes, self.sort_option)
 
     def get_themes(self) -> List[Dict[str, Any]]:
         """
@@ -487,38 +578,91 @@ class ThemeManager:
         Returns:
             List[Dict[str, Any]]: A list of theme dictionaries.
         """
-        return self.storage.load()
+        return self.storage.load(self.sort_option)
 
     def download_themes(self) -> None:
         """Download and process all themes in storage."""
         themes = self.get_themes()
         updated_themes = []
-        for theme in themes:
-            updated_theme = self.downloader.download(theme)
-            if updated_theme is not None:
+        for theme in tqdm(
+            themes, desc=f"Downloading themes ({self.sort_option.name})", unit="theme"
+        ):
+            try:
+                updated_theme = self.downloader.download(theme)
                 updated_themes.append(updated_theme)
-        self.storage.save(updated_themes)
-        logging.info(
-            f"All themes downloaded and metadata updated. {len(updated_themes)} valid themes found."
-        )
+            except Exception as e:
+                logging.error(
+                    f"Error processing theme {theme.get('displayName', 'Unknown')}: {str(e)}"
+                )
+
+        if updated_themes:
+            self.storage.save(updated_themes, self.sort_option)
+            logging.info(
+                f"{len(updated_themes)} themes processed and metadata updated."
+            )
+        else:
+            logging.warning("No themes were successfully processed.")
+
+    def check_integrity(self) -> None:
+        """Check the integrity of all theme files in theme folders."""
+        themes = self.get_themes()
+        missing_files = []
+        corrupted_files = []
+
+        for theme in tqdm(
+            themes,
+            desc=f"Checking theme integrity ({self.sort_option.name})",
+            unit="theme",
+        ):
+            theme_dir = theme.get("theme_dir")
+            if not theme_dir or not os.path.exists(theme_dir):
+                missing_files.append(f"Theme directory not found: {theme_dir}")
+                continue
+
+            theme_files = theme.get("theme_files", [])
+            for theme_file in theme_files:
+                file_path = os.path.join(theme_dir, theme_file["file"])
+                if not os.path.exists(file_path):
+                    missing_files.append(f"Missing file: {file_path}")
+                else:
+                    try:
+                        with open(file_path, "r") as f:
+                            json.load(f)
+                    except json.JSONDecodeError:
+                        corrupted_files.append(f"Corrupted JSON file: {file_path}")
+
+        if missing_files or corrupted_files:
+            logging.error("Integrity check failed:")
+            for file in missing_files:
+                logging.error(file)
+            for file in corrupted_files:
+                logging.error(file)
+        else:
+            logging.info("All theme files passed integrity check.")
 
     def clear_metadata(self) -> None:
         """Clear the theme metadata file."""
-        path = "themes/list.json"
+        path = os.path.join(
+            self.storage.base_path, f"{self.sort_option.name.lower()}.json"
+        )
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w") as file:
-            commentjson.dump([], file)
+            json.dump([], file)
 
     def clear_archives(self) -> None:
         """Clear the theme cache."""
-        path = "themes/archives"
-        for file in os.listdir(path):
-            if file != ".gitkeep":
-                os.remove(os.path.join(path, file))
+        path = self.downloader.archives_dir
+        if os.path.exists(path):
+            for file in os.listdir(path):
+                if file != ".gitkeep":
+                    os.remove(os.path.join(path, file))
+            logging.info("Archives directory cleared successfully.")
+        else:
+            logging.warning("Archives directory does not exist.")
 
     def clear_themes(self) -> None:
         """Clear the folders in the theme directory."""
-        path = "themes/themes"
+        path = self.downloader.themes_dir
         for item in os.listdir(path):
             item_path = os.path.join(path, item)
             if item != ".gitkeep":
@@ -529,38 +673,25 @@ class ThemeManager:
         logging.info("Themes directory cleared successfully.")
 
     def cleanup(self) -> None:
-        # get all theme files from list.json
         themes = self.get_themes()
-        theme_files = []
+        theme_dirs = set()
         for theme in themes:
-            theme_file_list = theme.get("theme_files", [])
-            package_json_path = os.path.join(
-                theme.get("theme_dir", ""), "extension", "package.json"
-            ).lstrip("./")
-            theme_files.append(package_json_path)
-            for theme_file in theme_file_list:
-                theme_files.append(theme_file.get("file", ""))
+            publisher_name = theme["publisher"]["publisherName"]
+            extension_name = theme["extension"]["extensionName"]
+            version = theme["extension"]["latestVersion"]
+            theme_dir = f"{self.downloader.themes_dir}/{publisher_name}.{extension_name}/{version}"
+            theme_dirs.add(theme_dir)
 
-        # print(json.dumps(theme_files, indent=2))
+        # Remove directories that are not in the current theme list
+        for root, dirs, files in os.walk(self.downloader.themes_dir, topdown=False):
+            for dir in dirs:
+                full_path = os.path.join(root, dir)
+                if not any(theme_dir.startswith(full_path) for theme_dir in theme_dirs):
+                    shutil.rmtree(full_path)
+                    logging.info(f"Removed outdated theme directory: {full_path}")
 
-        # delete all files and folder in themes that are not in theme_files
-        delete_files = []
-
-        for root, dirs, files in os.walk("themes/themes"):
-            for file in files:
-                if file not in theme_files:
-                    delete_files.append(os.path.join(root, file))
-
-        # subtract theme_files from delete_files
-        delete_files = [file for file in delete_files if file not in theme_files]
-
-        for delete_file in delete_files:
-            if os.path.exists(delete_file):
-                os.remove(delete_file)
-
-        # walk recursively in folders in themes and delete empty folders
-        # Recursively remove empty subfolders
-        self._remove_empty_folders("themes/themes")
+        # Remove empty directories
+        self._remove_empty_folders(self.downloader.themes_dir)
 
     def _remove_empty_folders(self, path: str) -> None:
         for folder in os.listdir(path):
@@ -579,9 +710,10 @@ def create_manager(
     downloader_class=VSCodeThemeDownloader,
     page_size=50,
     max_pages=10,
-    storage_path="themes/list.json",
+    storage_path="themes",
     themes_dir="./themes/themes",
     archives_dir="./themes/archives",
+    sort_option=ThemeSortOption.MostInstalled,
 ) -> ThemeManager:
     """
     Create and configure a ThemeManager instance.
@@ -595,47 +727,75 @@ def create_manager(
         storage_path (str): Path to the theme metadata storage file.
         themes_dir (str): Directory to store extracted themes.
         archives_dir (str): Directory to store downloaded theme archives.
+        sort_option (ThemeSortOption): Sorting option for themes.
 
     Returns:
         ThemeManager: A configured ThemeManager instance.
     """
-    fetcher = fetcher_class(page_size=page_size, max_pages=max_pages)
+    fetcher = fetcher_class(
+        page_size=page_size, max_pages=max_pages, sort_option=sort_option
+    )
     storage = storage_class(storage_path)
     downloader = downloader_class(themes_dir=themes_dir, archives_dir=archives_dir)
-    return ThemeManager(fetcher, storage, downloader)
+    return ThemeManager(fetcher, storage, downloader, sort_option)
 
 
-def run_command(manager: ThemeManager, command: str) -> None:
+def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> None:
     """
-    Run a command using the ThemeManager.
+    Run a command using the ThemeManagers.
 
     Args:
-        manager (ThemeManager): The ThemeManager instance.
-        command (str): The command to run ('metadata', 'download', or 'all').
+        managers (Dict[ThemeSortOption, ThemeManager]): The ThemeManager instances.
+        command (str): The command to run.
     """
-    if command == "metadata":
-        manager.fetch_and_save_themes()
-    elif command == "download":
-        manager.download_themes()
-    elif command == "clear_metadata":
-        manager.clear_metadata()
-    elif command == "clear_cache":
-        manager.clear_archives()
-        manager.clear_themes()
-    elif command == "clear_all":
-        manager.clear_metadata()
-        manager.clear_archives()
-        manager.clear_themes()
-    elif command == "all":
-        manager.clear_metadata()
-        manager.clear_archives()
-        manager.clear_themes()
-        manager.fetch_and_save_themes()
-        manager.download_themes()
-        manager.cleanup()
-        manager.clear_archives()
-    elif command == "cleanup":
-        manager.cleanup()
+
+    def execute_for_all_managers(method_name: str):
+        for manager in managers.values():
+            getattr(manager, method_name)()
+
+    def clear_cache():
+        for manager in managers.values():
+            manager.clear_archives()
+            manager.clear_themes()
+
+    def clear_all():
+        for manager in managers.values():
+            manager.clear_metadata()
+        clear_cache()
+
+    def run_all():
+        for manager in managers.values():
+            manager.fetch_and_save_themes()
+            manager.download_themes()
+
+    def delete_archives():
+        archives_dir = next(iter(managers.values())).downloader.archives_dir
+        if os.path.exists(archives_dir):
+            shutil.rmtree(archives_dir)
+            os.makedirs(archives_dir)
+            logging.info("Deleted all archive files.")
+        else:
+            logging.warning("Archives directory does not exist.")
+
+    def check_integrity():
+        for manager in managers.values():
+            manager.check_integrity()
+
+    command_map = {
+        "metadata": lambda: execute_for_all_managers("fetch_and_save_themes"),
+        "download": lambda: execute_for_all_managers("download_themes"),
+        "clear_metadata": lambda: execute_for_all_managers("clear_metadata"),
+        "clear_cache": clear_cache,
+        "clear_all": clear_all,
+        "all": lambda: (run_all(), delete_archives()),
+        "check_integrity": check_integrity,
+    }
+
+    action = command_map.get(command)
+    if action:
+        action()
+    else:
+        logging.error(f"Unknown command: {command}")
 
 
 def main():
@@ -644,7 +804,7 @@ def main():
     parser.add_argument(
         "--log-level",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL", "NONE"],
-        default="INFO",
+        default="ERROR",
         help="Set the logging level",
     )
     parser.add_argument(
@@ -671,14 +831,22 @@ def main():
     subparsers.add_parser("clear_metadata", help="Clear the metadata file")
     subparsers.add_parser("clear_cache", help="Clear the cache")
     subparsers.add_parser("clear_all", help="Clear the metadata, cache, and themes")
-    subparsers.add_parser("cleanup", help="Cleanup the themes directory")
+    subparsers.add_parser(
+        "check_integrity", help="Check the integrity of downloaded theme files"
+    )
 
     args = parser.parse_args()
 
     setup_logger(args.log_level)
 
-    manager = create_manager(page_size=args.page_size, max_pages=args.max_pages)
-    run_command(manager, args.command)
+    managers = {
+        sort_option: create_manager(
+            page_size=args.page_size, max_pages=args.max_pages, sort_option=sort_option
+        )
+        for sort_option in ThemeSortOption
+    }
+
+    run_command(managers, args.command)
 
 
 if __name__ == "__main__":

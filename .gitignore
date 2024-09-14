@@ -5,10 +5,8 @@ node_modules
 *.vsix
 venv
 
-server/themes/archives/*
-server/themes/themes/*
-server/themes/list.json
-
+server/themes/*
+!server/themes/.gitkeep
 !.gitkeep
 
 __pycache__
