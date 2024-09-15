@@ -1,4 +1,4 @@
-function formatLabel(label: string) {
+export function formatLabel(label: string) {
   // Extract the $(...) section
   if (!label.includes('|')) {
     return label;

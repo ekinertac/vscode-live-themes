@@ -65,6 +65,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## TODO
 
+- [ ] No tests at all for the extension, add some!
 - [ ] Implement search functionality
 - [ ] Research for theme installation
 - Any other brilliant ideas?
