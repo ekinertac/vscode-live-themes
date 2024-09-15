@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as Sentry from '@sentry/node';
-import { Action, ThemeQuickPickItem } from '../types';
+import { Action, ThemeCategoryQuickPickItem, ThemeFileQuickPickItem, ThemeQuickPickItem } from '../types';
 import { getThemes, fetchThemeFile } from '../services/themeService';
 import { restoreOriginalConfigurations, updateConfigurations } from '../services/configurationService';
 import { createThemeQuickPick, createFileQuickPick, createCategoryQuickPick } from '../ui/quickPicks';
@@ -34,7 +34,7 @@ function handleThemeQuickPickEvents(themeQuickPick: vscode.QuickPick<ThemeQuickP
 }
 
 function handleFileQuickPickEvents(
-  fileQuickPick: vscode.QuickPick<vscode.QuickPickItem>,
+  fileQuickPick: vscode.QuickPick<ThemeFileQuickPickItem>,
   themeQuickPick: vscode.QuickPick<ThemeQuickPickItem>,
   selectedTheme: ThemeQuickPickItem,
 ) {
@@ -59,8 +59,9 @@ function handleFileQuickPickEvents(
 
   fileQuickPick.onDidAccept(() => {
     const selectedFile = fileQuickPick.selectedItems[0];
-    if (selectedFile.label === '$(arrow-left) Go Back') {
+    if ((selectedFile as ThemeFileQuickPickItem).action === Action.GO_BACK) {
       fileQuickPick.hide();
+      themeQuickPick.items = [...themeQuickPick.items];
       themeQuickPick.show();
     } else if (selectedFile) {
       const theme = selectedTheme.theme;
@@ -84,7 +85,8 @@ export function registerThemeSelectorCommand(context: vscode.ExtensionContext): 
   return vscode.commands.registerCommand('live-themes.selectTheme', async () => {
     try {
       const categoryQuickPick = createCategoryQuickPick();
-      let lastActiveCategoryItem: vscode.QuickPickItem | undefined;
+      let lastActiveCategoryItem: ThemeCategoryQuickPickItem | undefined;
+      let lastActiveThemeItem: ThemeQuickPickItem | undefined;
 
       categoryQuickPick.onDidChangeActive((items) => {
         if (items.length > 0) {
@@ -101,6 +103,12 @@ export function registerThemeSelectorCommand(context: vscode.ExtensionContext): 
 
           const themes = await getThemes(context, selectedCategory.theme_list_file || '');
           const themeQuickPick = createThemeQuickPick(themes);
+
+          themeQuickPick.onDidChangeActive((items) => {
+            if (items.length > 0) {
+              lastActiveThemeItem = items[0];
+            }
+          });
 
           handleThemeQuickPickEvents(themeQuickPick);
 
@@ -122,6 +130,16 @@ export function registerThemeSelectorCommand(context: vscode.ExtensionContext): 
               const fileQuickPick = createFileQuickPick(selectedTheme.theme);
               fileQuickPick.title = `Step 2/3: ${selectedTheme.theme.displayName}`;
               handleFileQuickPickEvents(fileQuickPick, themeQuickPick, selectedTheme);
+
+              fileQuickPick.onDidHide(() => {
+                restoreOriginalConfigurations();
+                // Update the items and restore the last active item
+                themeQuickPick.items = [...themeQuickPick.items];
+                if (lastActiveThemeItem) {
+                  themeQuickPick.activeItems = [lastActiveThemeItem];
+                }
+                themeQuickPick.show();
+              });
 
               fileQuickPick.show();
             }

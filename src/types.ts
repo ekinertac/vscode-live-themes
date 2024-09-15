@@ -34,10 +34,11 @@ export const Action = {
   SELECT_THEME: 'select-theme',
   SELECT_CATEGORY: 'select-category',
   SELECT_FILE: 'select-file',
+  SEARCH_THEMES: 'search-themes',
 };
 
 export interface ThemeCategoryQuickPickItem extends vscode.QuickPickItem {
-  theme_list_file: string | null;
+  theme_list_file?: string | null;
   action?: string;
 }
 export interface ThemeQuickPickItem extends vscode.QuickPickItem {

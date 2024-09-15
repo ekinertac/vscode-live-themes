@@ -1,5 +1,12 @@
 import * as vscode from 'vscode';
-import { Theme, ThemeQuickPickItem, ThemeFile, ThemeCategoryQuickPickItem, Action } from '../types';
+import {
+  Theme,
+  ThemeQuickPickItem,
+  ThemeFile,
+  ThemeCategoryQuickPickItem,
+  Action,
+  ThemeFileQuickPickItem,
+} from '../types';
 import alignText from '../utils/alignText';
 
 export function createCategoryQuickPick(): vscode.QuickPick<ThemeCategoryQuickPickItem> {
@@ -44,6 +51,7 @@ export function createCategoryQuickPick(): vscode.QuickPick<ThemeCategoryQuickPi
       label: '$(search) Search Themes | Search themes by name',
       description: '',
       theme_list_file: null,
+      action: Action.SEARCH_THEMES,
     },
   ];
 
@@ -80,8 +88,8 @@ export function createThemeQuickPick(themes: Theme[]): vscode.QuickPick<ThemeQui
   return quickPick;
 }
 
-export function createFileQuickPick(theme: Theme): vscode.QuickPick<vscode.QuickPickItem> {
-  const quickPick = vscode.window.createQuickPick();
+export function createFileQuickPick(theme: Theme): vscode.QuickPick<ThemeFileQuickPickItem> {
+  const quickPick = vscode.window.createQuickPick<ThemeFileQuickPickItem>();
   const goBackItem = alignText([
     {
       label: '$(arrow-left) Go Back | Return to theme selection',
