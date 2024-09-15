@@ -126,11 +126,14 @@ class VSCodeThemeFetcher(ThemeFetcher):
             List[Dict[str, Any]]: A list of theme dictionaries.
         """
         all_themes = []
-        for page_number in range(1, self.max_pages + 1):
-            results = self._get_vscode_themes(self.page_size, page_number)
-            theme_list = self._build_theme_list(results)
-            all_themes.extend(theme_list)
-            time.sleep(1)
+        with tqdm(total=self.max_pages, desc="Fetching pages", unit="page") as pbar:
+            for page_number in range(1, self.max_pages + 1):
+                results = self._get_vscode_themes(self.page_size, page_number)
+                theme_list = self._build_theme_list(results)
+                all_themes.extend(theme_list)
+                pbar.update(1)
+                pbar.set_postfix({"themes": len(all_themes)})
+                time.sleep(1)
         return all_themes
 
     def _post_data(self, page_number: int) -> Dict[str, Any]:
@@ -190,7 +193,13 @@ class VSCodeThemeFetcher(ThemeFetcher):
             "content-type": "application/json",
         }
         data = self._post_data(page_number)
-        response = requests.post(url, headers=headers, json=data)
+
+        with tqdm(
+            total=1, desc=f"Fetching page {page_number}", unit="request", leave=False
+        ) as pbar:
+            response = requests.post(url, headers=headers, json=data)
+            pbar.update(1)
+
         return response.json()
 
     def _get_download_url(
