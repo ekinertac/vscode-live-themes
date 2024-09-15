@@ -43,10 +43,6 @@ def main():
     subparsers.add_parser(
         "download", help="Download and extract themes based on the fetched metadata"
     )
-    subparsers.add_parser("all", help="Fetch metadata and download all themes")
-    subparsers.add_parser("clear_metadata", help="Clear the metadata file")
-    subparsers.add_parser("clear_cache", help="Clear the cache")
-    subparsers.add_parser("clear_all", help="Clear the metadata, cache, and themes")
     subparsers.add_parser(
         "check_integrity", help="Check the integrity of downloaded theme files"
     )
@@ -58,6 +54,7 @@ def main():
         "build_search_index",
         help="Build a search index for all themes and save it as search.json",
     )
+    subparsers.add_parser("all", help="Fetch metadata and download all themes")
 
     args = parser.parse_args()
 

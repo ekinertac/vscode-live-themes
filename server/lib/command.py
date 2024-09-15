@@ -88,10 +88,12 @@ def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> 
     command_map = {
         "metadata": lambda: execute_for_all_managers("fetch_and_save_themes"),
         "download": lambda: execute_for_all_managers("download_themes"),
-        "clear_metadata": lambda: execute_for_all_managers("clear_metadata"),
-        "clear_cache": clear_cache,
-        "clear_all": clear_all,
-        "all": lambda: (run_all(), delete_archives(), cleanup(), build_search_index()),
+        "all": lambda: (
+            run_all(),
+            delete_archives(),
+            build_search_index(),
+            cleanup(),
+        ),
         "check_integrity": check_integrity,
         "cleanup": cleanup,
         "build_search_index": build_search_index,

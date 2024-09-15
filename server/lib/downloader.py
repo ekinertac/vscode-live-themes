@@ -84,7 +84,9 @@ class VSCodeThemeDownloader(ThemeDownloader):
             logging.info(
                 f"Skipping download: Already have the latest version of {publisher_name}.{extension_name} (version {version})"
             )
-            return self._update_theme_info(theme, theme_base_dir, version)
+            # Ensure theme_files is updated even if download is skipped
+            theme_dir = os.path.join(theme_base_dir, version)
+            return self._update_theme_info(theme, theme_dir, version)
 
         vsix_path = os.path.join(
             self.archives_dir, f"{publisher_name}.{extension_name}.{version}.vsix"
