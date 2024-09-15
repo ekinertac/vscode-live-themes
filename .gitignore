@@ -12,6 +12,7 @@ server/themes/*
 __pycache__
 .pytest_cache
 htmlcov
+coverage/
 .coverage
 .coverage.*
 .cache
@@ -21,4 +22,4 @@ no
 .venv
 .env
 .DS_Store
-*.log
+*.logcoverage/
