@@ -1,4 +1,5 @@
 import os
+from pprint import pprint
 import time
 from typing import Any, List, Dict, Optional
 import requests
@@ -13,6 +14,7 @@ from enum import Enum
 import tempfile
 from tqdm import tqdm
 import sentry_sdk
+import glob
 
 sentry_sdk.init(
     dsn="https://a7f5a48af43cecc6ed10281e52b0ebcb@o352105.ingest.us.sentry.io/4507953095245824",
@@ -681,36 +683,22 @@ class ThemeManager:
                     shutil.rmtree(item_path)
         logging.info("Themes directory cleared successfully.")
 
-    def cleanup(self) -> None:
+    def get_all_theme_files(self) -> List[str]:
+        """Get all theme file paths and package.json files from theme lists."""
+        all_files = set()
         themes = self.get_themes()
-        theme_dirs = set()
         for theme in themes:
-            publisher_name = theme["publisher"]["publisherName"]
-            extension_name = theme["extension"]["extensionName"]
-            version = theme["extension"]["latestVersion"]
-            theme_dir = f"{self.downloader.themes_dir}/{publisher_name}.{extension_name}/{version}"
-            theme_dirs.add(theme_dir)
+            theme_dir = theme.get("theme_dir")
+            if theme_dir and os.path.exists(theme_dir):
+                # Add theme files
+                for theme_file in theme.get("theme_files", []):
+                    all_files.add(theme_file["file"].replace("./", ""))
 
-        # Remove directories that are not in the current theme list
-        for root, dirs, files in os.walk(self.downloader.themes_dir, topdown=False):
-            for dir in dirs:
-                full_path = os.path.join(root, dir)
-                if not any(theme_dir.startswith(full_path) for theme_dir in theme_dirs):
-                    shutil.rmtree(full_path)
-                    logging.info(f"Removed outdated theme directory: {full_path}")
+                # Add package.json
+                package_json_path = os.path.join(theme_dir, "extension", "package.json")
+                all_files.add(package_json_path.replace("./", ""))
 
-        # Remove empty directories
-        self._remove_empty_folders(self.downloader.themes_dir)
-
-    def _remove_empty_folders(self, path: str) -> None:
-        for folder in os.listdir(path):
-            full_path = os.path.join(path, folder)
-            if os.path.isdir(full_path):
-                self._remove_empty_folders(full_path)
-
-        # If the directory is empty, delete it
-        if not os.listdir(path):
-            os.rmdir(path)
+        return list(all_files)
 
 
 def create_manager(
@@ -790,14 +778,48 @@ def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> 
         for manager in managers.values():
             manager.check_integrity()
 
+    def cleanup():
+        # Get all theme files and package.json files
+        all_theme_files = set()
+        for manager in managers.values():
+            all_theme_files.update(manager.get_all_theme_files())
+
+        # Get all files in the themes directory
+        themes_dir = next(iter(managers.values())).downloader.themes_dir
+        all_files_in_dir = []
+        for path in glob.glob(os.path.join(themes_dir, "**", "*"), recursive=True):
+            all_files_in_dir.append(path.replace("./", ""))
+
+        all_files_in_dir = set(all_files_in_dir)
+
+        # Get the difference
+        files_to_delete = all_files_in_dir - all_theme_files
+
+        # Delete the difference files
+        for file_path in files_to_delete:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+                logging.info(f"Deleted file: {file_path}")
+
+        # Remove empty directories
+        for root, dirs, files in os.walk(themes_dir, topdown=False):
+            for dir in dirs:
+                dir_path = os.path.join(root, dir)
+                if not os.listdir(dir_path):
+                    os.rmdir(dir_path)
+                    logging.info(f"Removed empty directory: {dir_path}")
+
+        logging.info("Cleanup completed successfully.")
+
     command_map = {
         "metadata": lambda: execute_for_all_managers("fetch_and_save_themes"),
         "download": lambda: execute_for_all_managers("download_themes"),
         "clear_metadata": lambda: execute_for_all_managers("clear_metadata"),
         "clear_cache": clear_cache,
         "clear_all": clear_all,
-        "all": lambda: (run_all(), delete_archives()),
+        "all": lambda: (run_all(), delete_archives(), cleanup()),
         "check_integrity": check_integrity,
+        "cleanup": cleanup,
     }
 
     action = command_map.get(command)
@@ -842,6 +864,10 @@ def main():
     subparsers.add_parser("clear_all", help="Clear the metadata, cache, and themes")
     subparsers.add_parser(
         "check_integrity", help="Check the integrity of downloaded theme files"
+    )
+    subparsers.add_parser(
+        "cleanup",
+        help="Remove invalid files and empty directories from the themes folder",
     )
 
     args = parser.parse_args()
