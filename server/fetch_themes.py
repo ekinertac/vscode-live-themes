@@ -550,7 +550,11 @@ class VSCodeThemeDownloader(ThemeDownloader):
         )
 
         logging.debug(f"Added theme: {theme_name}")
-        return {"file": full_path, "name": theme_name}
+        return {
+            "file": full_path,
+            "name": theme_name,
+            "uiTheme": theme.get("uiTheme", ""),
+        }
 
 
 class ThemeManager:
@@ -687,11 +691,15 @@ class ThemeManager:
         """Get all theme file paths and package.json files from theme lists."""
         all_files = set()
         themes = self.get_themes()
-        for theme in themes:
+        for theme in tqdm(themes, desc="Getting all theme files", unit="theme"):
             theme_dir = theme.get("theme_dir")
             if theme_dir and os.path.exists(theme_dir):
                 # Add theme files
-                for theme_file in theme.get("theme_files", []):
+                for theme_file in tqdm(
+                    theme.get("theme_files", []),
+                    desc="Getting all theme files",
+                    unit="file",
+                ):
                     all_files.add(theme_file["file"].replace("./", ""))
 
                 # Add package.json
