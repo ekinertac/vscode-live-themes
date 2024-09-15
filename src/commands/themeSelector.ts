@@ -84,6 +84,14 @@ export function registerThemeSelectorCommand(context: vscode.ExtensionContext): 
   return vscode.commands.registerCommand('live-themes.selectTheme', async () => {
     try {
       const categoryQuickPick = createCategoryQuickPick();
+      let lastActiveCategoryItem: vscode.QuickPickItem | undefined;
+
+      categoryQuickPick.onDidChangeActive((items) => {
+        if (items.length > 0) {
+          lastActiveCategoryItem = items[0];
+        }
+      });
+
       categoryQuickPick.show();
 
       categoryQuickPick.onDidAccept(async () => {
@@ -100,7 +108,11 @@ export function registerThemeSelectorCommand(context: vscode.ExtensionContext): 
             const selectedTheme = themeQuickPick.selectedItems[0];
             if (selectedTheme.action === Action.GO_BACK) {
               themeQuickPick.hide();
-              console.log(categoryQuickPick.items);
+              // Update the items and restore the last active item
+              categoryQuickPick.items = [...categoryQuickPick.items];
+              if (lastActiveCategoryItem) {
+                categoryQuickPick.activeItems = [lastActiveCategoryItem];
+              }
               categoryQuickPick.show();
               return;
             }

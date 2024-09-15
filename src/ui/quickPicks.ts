@@ -7,7 +7,7 @@ export function createCategoryQuickPick(): vscode.QuickPick<ThemeCategoryQuickPi
   const labels = [
     {
       label: '$(star-full) By Rating | You can find most interesting themes here',
-      description: '',
+      description: '12.4K themes',
       theme_list_file: 'byrating',
     },
     {
