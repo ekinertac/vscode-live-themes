@@ -43,15 +43,15 @@
   "contributes": {
     "commands": [
       {
-        "command": "live-themes.logToConsole",
+        "command": "live-themes.selectTheme",
         "title": "Live Themes: Open Theme Selector"
       }
     ],
     "keybindings": [
       {
-        "command": "live-themes.logToConsole",
-        "key": "ctrl+shift+t",
-        "mac": "cmd+shift+t",
+        "command": "live-themes.selectTheme",
+        "key": "ctrl+win+t",
+        "mac": "cmd+ctrl+t",
         "when": "editorTextFocus"
       }
     ]

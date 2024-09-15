@@ -1,20 +1,20 @@
 import * as vscode from 'vscode';
 import axios from 'axios';
+import * as fs from 'fs';
+import * as path from 'path';
 import { Theme } from '../types';
 import stripJsonComments from '../utils/strip-json-comments';
 
+// Add this function to check if we're in development mode
+const __DEV__ = process.env.VSCODE_DEBUG_MODE === 'true';
+
 const THEMES_CACHE_KEY = 'liveThemes.cachedThemes';
 const axiosClient = axios.create({
-  baseURL: 'https://vscode-live-themes.ekinertac.com',
+  baseURL: __DEV__ ? 'http://localhost:9000' : 'https://vscode-live-themes.ekinertac.com',
 });
 
-// Add this function to check if we're in development mode
-function isDevelopmentMode(): boolean {
-  return process.env.VSCODE_DEBUG_MODE === 'true';
-}
-
-async function fetchThemes(): Promise<Theme[]> {
-  const response = await axiosClient.get('/themes/list.json');
+async function fetchThemes(theme_list_file: string): Promise<Theme[]> {
+  const response = await axiosClient.get(`/themes/${theme_list_file}.json`);
   return response.data;
 }
 
@@ -27,10 +27,8 @@ export async function fetchThemeFile(fileUrl: string): Promise<any> {
   return response.data;
 }
 
-export async function getThemes(context: vscode.ExtensionContext): Promise<Theme[]> {
-  const isDevMode = isDevelopmentMode();
-
-  if (!isDevMode) {
+export async function getThemes(context: vscode.ExtensionContext, theme_list_file: string): Promise<Theme[]> {
+  if (!__DEV__) {
     const cachedData = context.globalState.get<{ themes: Theme[]; timestamp: number }>(THEMES_CACHE_KEY);
     const now = Date.now();
 
@@ -39,9 +37,9 @@ export async function getThemes(context: vscode.ExtensionContext): Promise<Theme
     }
   }
 
-  const themes = await fetchThemes();
+  const themes = await fetchThemes(theme_list_file);
 
-  if (!isDevMode) {
+  if (!__DEV__) {
     await context.globalState.update(THEMES_CACHE_KEY, { themes, timestamp: Date.now() });
   }
 

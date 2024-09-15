@@ -29,6 +29,23 @@ export interface ThemeFile {
   file: string;
 }
 
+export const Action = {
+  GO_BACK: 'go-back',
+  SELECT_THEME: 'select-theme',
+  SELECT_CATEGORY: 'select-category',
+  SELECT_FILE: 'select-file',
+};
+
+export interface ThemeCategoryQuickPickItem extends vscode.QuickPickItem {
+  theme_list_file: string | null;
+  action?: string;
+}
 export interface ThemeQuickPickItem extends vscode.QuickPickItem {
-  theme: Theme;
+  theme?: Theme;
+  action?: string;
+}
+
+export interface ThemeFileQuickPickItem extends vscode.QuickPickItem {
+  theme_file?: ThemeFile;
+  action?: string;
 }

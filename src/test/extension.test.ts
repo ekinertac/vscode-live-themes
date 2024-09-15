@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import axios from 'axios';
 
 suite('Extension Test Suite', () => {
-  test('logToConsole command shows progress and multi-step quick pick', async () => {
+  test('selectTheme command shows progress and multi-step quick pick', async () => {
     const mockThemes = [
       {
         displayName: 'Theme 1',
@@ -64,7 +64,7 @@ suite('Extension Test Suite', () => {
     getConfigurationStub.withArgs('workbench').returns(workbenchConfigStub);
 
     // Execute the command
-    await vscode.commands.executeCommand('live-themes.logToConsole');
+    await vscode.commands.executeCommand('live-themes.selectTheme');
 
     // Simulate onDidChangeActive
     const createdQuickPick = quickPickStub.returnValues[0];
