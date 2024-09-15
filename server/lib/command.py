@@ -8,13 +8,16 @@ from lib.abstract import ThemeSortOption
 from lib.manager import ThemeManager
 
 
-def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> None:
+def run_command(
+    managers: Dict[ThemeSortOption, ThemeManager], command: str, args: object
+) -> None:
     """
     Run a command using the ThemeManagers.
 
     Args:
         managers (Dict[ThemeSortOption, ThemeManager]): The ThemeManager instances.
         command (str): The command to run.
+        args (object): The parsed command-line arguments.
     """
 
     def execute_for_all_managers(method_name: str):
@@ -36,6 +39,13 @@ def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> 
             manager.fetch_and_save_themes()
             manager.download_themes()
 
+            # Process single themes
+            single_themes = manager.get_single_themes()
+            for theme in single_themes:
+                publisher_name = theme["publisher"]["publisherName"]
+                extension_name = theme["extension"]["extensionName"]
+                manager.download_single_theme(publisher_name, extension_name)
+
     def delete_archives():
         archives_dir = next(iter(managers.values())).downloader.archives_dir
         if os.path.exists(archives_dir):
@@ -48,6 +58,19 @@ def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> 
     def check_integrity():
         for manager in managers.values():
             manager.check_integrity()
+
+    def download_single_theme():
+        if args.theme:
+            try:
+                publisher_name, extension_name = args.theme.split(".", 1)
+                for manager in managers.values():
+                    manager.download_single_theme(publisher_name, extension_name)
+            except ValueError:
+                logging.error(
+                    "Invalid theme format. Please use 'publisher.extensionName'"
+                )
+        else:
+            logging.error("No theme specified. Use --theme publisher.extensionName")
 
     def cleanup():
         # Get all theme files and package.json files
@@ -88,6 +111,7 @@ def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> 
     command_map = {
         "metadata": lambda: execute_for_all_managers("fetch_and_save_themes"),
         "download": lambda: execute_for_all_managers("download_themes"),
+        "single": download_single_theme,
         "all": lambda: (
             run_all(),
             delete_archives(),

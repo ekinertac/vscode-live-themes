@@ -1,4 +1,5 @@
 import logging
+from pprint import pprint
 from typing import Any, Dict, List
 
 import requests
@@ -83,6 +84,25 @@ class VSCodeThemeFetcher(ThemeFetcher):
             "flags": 870,
         }
 
+    def _post_data_single_theme(self, publisher_name, extensionName):
+        return {
+            "assetTypes": None,
+            "filters": [
+                {
+                    "criteria": [
+                        {"filterType": 7, "value": f"{publisher_name}.{extensionName}"}
+                    ],
+                    "direction": 2,
+                    "pageSize": 100,
+                    "pageNumber": 1,
+                    "sortBy": 0,
+                    "sortOrder": 0,
+                    "pagingToken": None,
+                }
+            ],
+            "flags": 2151,
+        }
+
     def _get_vscode_themes(self, page_size: int, page_number: int) -> Dict[str, Any]:
         """
         Fetch themes from the VS Code Marketplace API.
@@ -101,6 +121,7 @@ class VSCodeThemeFetcher(ThemeFetcher):
             "cache-control": "no-cache",
             "content-type": "application/json",
         }
+
         data = self._post_data(page_number)
 
         with tqdm(
@@ -186,3 +207,68 @@ class VSCodeThemeFetcher(ThemeFetcher):
                 }
             )
         return themes
+
+    def fetch_single_theme(
+        self, publisher_name: str, extension_name: str
+    ) -> Dict[str, Any]:
+        """
+        Fetch a single theme from the VS Code Marketplace.
+
+        Args:
+            publisher_name (str): The name of the theme publisher.
+            extension_name (str): The name of the theme extension.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the theme data.
+        """
+        url = "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery"
+        headers = {
+            "accept": "application/json;api-version=7.2-preview.1;excludeUrls=true",
+            "accept-language": "en-US,en;q=0.9,tr;q=0.8,es;q=0.7,de;q=0.6,nl;q=0.5,sv;q=0.4,pt;q=0.3,no;q=0.2,cs;q=0.1,ru;q=0.1,mt;q=0.1",
+            "cache-control": "no-cache",
+            "content-type": "application/json",
+        }
+        data = self._post_data_single_theme(publisher_name, extension_name)
+
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+
+        result = response.json()
+
+        if not result["results"] or not result["results"][0]["extensions"]:
+            raise ValueError(f"Theme not found: {publisher_name}.{extension_name}")
+
+        extension = result["results"][0]["extensions"][0]
+
+        # Process the single theme data directly
+        statistics = {}
+        for stat in extension.get("statistics", []):
+            if stat["statisticName"] == "install":
+                statistics["installs"] = stat["value"]
+            if stat["statisticName"] == "averagerating":
+                statistics["rating"] = stat["value"]
+            if stat["statisticName"] == "ratingcount":
+                statistics["ratingcount"] = stat["value"]
+
+        theme_data = {
+            "categories": extension["categories"],
+            "displayName": extension["displayName"],
+            "publisher": {
+                "displayName": extension["publisher"]["displayName"],
+                "publisherName": extension["publisher"]["publisherName"],
+            },
+            "tags": extension["tags"],
+            "statistics": statistics,
+            "extension": {
+                "extensionId": extension["extensionId"],
+                "extensionName": extension["extensionName"],
+                "latestVersion": extension["versions"][0]["version"],
+                "downloadUrl": self._get_download_url(
+                    extension["publisher"]["publisherName"],
+                    extension["extensionName"],
+                    extension["versions"][0]["version"],
+                ),
+            },
+        }
+
+        return theme_data

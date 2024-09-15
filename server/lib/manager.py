@@ -73,6 +73,81 @@ class ThemeManager:
         else:
             logging.warning("No themes were successfully processed.")
 
+    # MARK: - Single Download
+    def download_single_theme(self, publisher_name: str, extension_name: str) -> None:
+        """
+        Download and process a single theme.
+
+        Args:
+            publisher_name (str): The name of the theme publisher.
+            extension_name (str): The name of the theme extension.
+        """
+        try:
+            theme = self.fetcher.fetch_single_theme(publisher_name, extension_name)
+            updated_theme = self.downloader.download(theme)
+
+            # Save the single theme to a separate file
+            self._save_single_theme(updated_theme)
+
+            logging.info(
+                f"Theme {publisher_name}.{extension_name} processed and saved."
+            )
+        except ValueError as e:
+            logging.error(f"Error fetching theme: {str(e)}")
+        except Exception as e:
+            logging.error(
+                f"Error processing theme {publisher_name}.{extension_name}: {str(e)}"
+            )
+            logging.debug("Exception details:", exc_info=True)
+
+    # MARK: Single Save
+    def _save_single_theme(self, theme: Dict[str, Any]) -> None:
+        """
+        Save a single theme to a separate file.
+
+        Args:
+            theme (Dict[str, Any]): The theme data to save.
+        """
+        single_themes_file = os.path.join(self.storage.base_path, "single_themes.json")
+
+        if os.path.exists(single_themes_file):
+            with open(single_themes_file, "r") as f:
+                single_themes = json.load(f)
+        else:
+            single_themes = []
+
+        # Update or add the theme
+        theme_index = next(
+            (
+                i
+                for i, t in enumerate(single_themes)
+                if t["extension"]["extensionName"]
+                == theme["extension"]["extensionName"]
+            ),
+            None,
+        )
+        if theme_index is not None:
+            single_themes[theme_index] = theme
+        else:
+            single_themes.append(theme)
+
+        with open(single_themes_file, "w") as f:
+            json.dump(single_themes, f)
+
+    def get_single_themes(self) -> List[Dict[str, Any]]:
+        """
+        Get all single themes that have been downloaded.
+
+        Returns:
+            List[Dict[str, Any]]: A list of single theme dictionaries.
+        """
+        single_themes_file = os.path.join(self.storage.base_path, "single_themes.json")
+        if os.path.exists(single_themes_file):
+            with open(single_themes_file, "r") as f:
+                return json.load(f)
+        return []
+
+    # MARK: - Integrity Check
     def check_integrity(self) -> None:
         """Check the integrity of all theme files in theme folders."""
         themes = self.get_themes()
@@ -169,6 +244,9 @@ class ThemeManager:
             themes = self.storage.load(sort_option)
             all_themes.extend(themes)
 
+        # Add single themes
+        all_themes.extend(self.get_single_themes())
+
         # Remove duplicates based on extensionName and create the search index
         unique_themes = {}
         for theme in all_themes:
@@ -208,6 +286,7 @@ class ThemeManager:
         logging.info(f"Total unique themes indexed: {len(search_index)}")
 
 
+# MARK: - Factory
 def create_manager(
     fetcher_class=VSCodeThemeFetcher,
     storage_class=JSONThemeStorage,

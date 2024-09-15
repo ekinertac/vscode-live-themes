@@ -50,6 +50,18 @@ def main():
         "cleanup",
         help="Remove invalid files and empty directories from the themes folder",
     )
+    single = subparsers.add_parser(
+        "single",
+        help="Download and process a single theme from the VSCode Marketplace",
+    )
+
+    single.add_argument(
+        "--theme",
+        type=str,
+        help="The theme to download and process (e.g. 'publisher.extensionName')",
+        required=True,
+    )
+
     subparsers.add_parser(
         "build_search_index",
         help="Build a search index for all themes and save it as search.json",
@@ -67,7 +79,7 @@ def main():
         for sort_option in ThemeSortOption
     }
 
-    run_command(managers, args.command)
+    run_command(managers, args.command, args)
 
 
 if __name__ == "__main__":
