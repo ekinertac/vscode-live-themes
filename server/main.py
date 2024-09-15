@@ -2,10 +2,10 @@ import argparse
 
 import sentry_sdk
 
-from abstract import ThemeSortOption
-from command import run_command
-from manager import create_manager
-from utils import setup_logger
+from lib.abstract import ThemeSortOption
+from lib.command import run_command
+from lib.manager import create_manager
+from lib.utils import setup_logger
 
 sentry_sdk.init(
     dsn="https://a7f5a48af43cecc6ed10281e52b0ebcb@o352105.ingest.us.sentry.io/4507953095245824",

@@ -2,11 +2,11 @@ import json
 import logging
 import zipfile
 import requests
-from abstract import ThemeDownloader
 import os
 from typing import Any, Dict, List, Optional
 
-from utils import get_quickpick_detail
+from lib.abstract import ThemeDownloader
+from lib.utils import get_quickpick_detail
 
 
 class VSCodeThemeDownloader(ThemeDownloader):

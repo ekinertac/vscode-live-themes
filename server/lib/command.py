@@ -4,8 +4,8 @@ import os
 import shutil
 from typing import Dict
 
-from abstract import ThemeSortOption
-from manager import ThemeManager
+from lib.abstract import ThemeSortOption
+from lib.manager import ThemeManager
 
 
 def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> None:

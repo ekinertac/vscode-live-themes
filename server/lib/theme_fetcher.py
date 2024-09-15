@@ -3,7 +3,7 @@ from typing import Any, Dict, List
 
 import requests
 from tqdm import tqdm
-from abstract import ThemeFetcher, ThemeSortOption
+from lib.abstract import ThemeFetcher, ThemeSortOption
 
 
 class VSCodeThemeFetcher(ThemeFetcher):

@@ -1,9 +1,10 @@
-from abstract import ThemeSortOption, ThemeStorage
 from typing import Any, Dict, List
 import tempfile
 import json
 import os
 import commentjson
+
+from lib.abstract import ThemeSortOption, ThemeStorage
 
 
 class JSONThemeStorage(ThemeStorage):

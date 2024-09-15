@@ -3,13 +3,13 @@ import logging
 import os
 import shutil
 from tqdm import tqdm
-from abstract import ThemeDownloader, ThemeFetcher, ThemeSortOption, ThemeStorage
 from typing import Any, Dict, List
 
-from downloader import VSCodeThemeDownloader
-from storage import JSONThemeStorage
-from theme_fetcher import VSCodeThemeFetcher
-from utils import get_quickpick_detail
+from lib.downloader import VSCodeThemeDownloader
+from lib.storage import JSONThemeStorage
+from lib.theme_fetcher import VSCodeThemeFetcher
+from lib.utils import get_quickpick_detail
+from lib.abstract import ThemeDownloader, ThemeFetcher, ThemeSortOption, ThemeStorage
 
 
 class ThemeManager:
