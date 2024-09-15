@@ -138,7 +138,7 @@ class VSCodeThemeFetcher(ThemeFetcher):
                 all_themes.extend(theme_list)
                 pbar.update(1)
                 pbar.set_postfix({"themes": len(all_themes)})
-                time.sleep(1)
+                # time.sleep(1)
         return all_themes
 
     def _post_data(self, page_number: int) -> Dict[str, Any]:
