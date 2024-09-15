@@ -1,3 +1,7 @@
+// This is a modified version of strip-json-comments library
+// https://github.com/sindresorhus/strip-json-comments
+// It is used to strip comments from JSON strings
+
 const singleComment = Symbol('singleComment');
 const multiComment = Symbol('multiComment');
 
