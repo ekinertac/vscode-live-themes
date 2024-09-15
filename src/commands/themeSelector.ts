@@ -3,7 +3,12 @@ import * as Sentry from '@sentry/node';
 import { Action, ThemeCategoryQuickPickItem, ThemeFileQuickPickItem, ThemeQuickPickItem } from '../types';
 import { getThemes, fetchThemeFile } from '../services/themeService';
 import { restoreOriginalConfigurations, updateConfigurations } from '../services/configurationService';
-import { createThemeQuickPick, createFileQuickPick, createCategoryQuickPick } from '../ui/quickPicks';
+import {
+  createThemeQuickPick,
+  createFileQuickPick,
+  createCategoryQuickPick,
+  createSearchQuickPick,
+} from '../ui/quickPicks';
 
 function handleThemeQuickPickEvents(themeQuickPick: vscode.QuickPick<ThemeQuickPickItem>) {
   themeQuickPick.onDidChangeActive(async (items) => {
@@ -98,6 +103,21 @@ export function registerThemeSelectorCommand(context: vscode.ExtensionContext): 
 
       categoryQuickPick.onDidAccept(async () => {
         const selectedCategory = categoryQuickPick.selectedItems[0];
+        if (selectedCategory.action === Action.SEARCH_THEMES) {
+          categoryQuickPick.hide();
+          const searchQuickPick = createSearchQuickPick();
+          searchQuickPick.onDidAccept(() => {
+            searchQuickPick.hide();
+            categoryQuickPick.items = [...categoryQuickPick.items];
+            if (lastActiveCategoryItem) {
+              categoryQuickPick.activeItems = [lastActiveCategoryItem];
+            }
+            categoryQuickPick.show();
+          });
+          searchQuickPick.show();
+          return;
+        }
+
         if (selectedCategory) {
           categoryQuickPick.hide();
 

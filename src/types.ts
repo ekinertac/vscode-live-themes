@@ -50,3 +50,7 @@ export interface ThemeFileQuickPickItem extends vscode.QuickPickItem {
   theme_file?: ThemeFile;
   action?: string;
 }
+
+export interface SearchQuickPickItem extends vscode.QuickPickItem {
+  action?: string;
+}

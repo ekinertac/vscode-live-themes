@@ -1,5 +1,9 @@
 function formatLabel(label: string) {
   // Extract the $(...) section
+  if (!label.includes('|')) {
+    return label;
+  }
+
   const iconMatch = label.match(/^\$\([^)]+\)/);
   const icon = iconMatch ? iconMatch[0] : ''; // Add a space after the icon
 

@@ -6,6 +6,7 @@ import {
   ThemeCategoryQuickPickItem,
   Action,
   ThemeFileQuickPickItem,
+  SearchQuickPickItem,
 } from '../types';
 import alignText from '../utils/alignText';
 
@@ -108,5 +109,26 @@ export function createFileQuickPick(theme: Theme): vscode.QuickPick<ThemeFileQui
   quickPick.totalSteps = 3;
   quickPick.title = 'Step 3/3: Select a theme file';
   quickPick.buttons = [vscode.QuickInputButtons.Back];
+  return quickPick;
+}
+
+export function createSearchQuickPick(): vscode.QuickPick<SearchQuickPickItem> {
+  const quickPick = vscode.window.createQuickPick<SearchQuickPickItem>();
+  quickPick.items = alignText([
+    {
+      label: '$(arrow-left) Go Back | Return to category selection',
+      description: '',
+      action: Action.GO_BACK,
+    },
+    {
+      label: 'Not implemented yet',
+      description: '',
+      action: Action.SEARCH_THEMES,
+    },
+  ]);
+  quickPick.placeholder = 'Search themes';
+  quickPick.step = 1;
+  quickPick.totalSteps = 1;
+  quickPick.title = 'Search themes';
   return quickPick;
 }
