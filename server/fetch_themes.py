@@ -15,7 +15,9 @@ import tempfile
 from tqdm import tqdm
 import sentry_sdk
 import glob
-from collections import defaultdict
+
+from utils import get_quickpick_detail
+from utils import human_format
 
 sentry_sdk.init(
     dsn="https://a7f5a48af43cecc6ed10281e52b0ebcb@o352105.ingest.us.sentry.io/4507953095245824",
@@ -249,8 +251,12 @@ class VSCodeThemeFetcher(ThemeFetcher):
             for stat in extension.get("statistics", []):
                 if stat["statisticName"] == "install":
                     statistics["installs"] = stat["value"]
-                elif stat["statisticName"] == "weightedRating":
+
+                if stat["statisticName"] == "averagerating":
                     statistics["rating"] = stat["value"]
+
+                if stat["statisticName"] == "ratingcount":
+                    statistics["ratingcount"] = stat["value"]
 
             # MARK: List.json
             themes.append(
@@ -444,10 +450,20 @@ class VSCodeThemeDownloader(ThemeDownloader):
             )
 
         updated_theme = theme.copy()
+
+        detail = get_quickpick_detail(len(theme_files), updated_theme["statistics"])
+
+        quickPickData = {
+            "label": updated_theme["displayName"],
+            "description": updated_theme["publisher"]["displayName"],
+            "detail": detail,
+        }
+
         updated_theme.update(
             {
                 "theme_files": theme_files,
                 "theme_dir": theme_dir,
+                "quick_pick": quickPickData,
             }
         )
 
@@ -739,11 +755,14 @@ class ThemeManager:
                         for tf in theme["theme_files"]
                     ]
 
+                detail = get_quickpick_detail(
+                    len(theme_files), theme.get("statistics", {})
+                )
                 unique_themes[extension_name] = {
                     "label": theme["displayName"],
                     "description": theme["publisher"]["displayName"],
+                    "detail": detail,
                     "extensionName": extension_name,
-                    "detail": f"""{len(theme_files)} {len(theme_files) > 1 and 'Themes' or 'Theme'}""",
                     "themeFiles": theme_files,
                 }
 
@@ -753,7 +772,7 @@ class ThemeManager:
         # Save search index to file
         search_index_path = os.path.join(self.storage.base_path, "search.json")
         with open(search_index_path, "w") as f:
-            json.dump(search_index, f, indent=2)
+            json.dump(search_index, f)
 
         logging.info(f"Search index saved to {search_index_path}")
         logging.info(f"Total unique themes indexed: {len(search_index)}")
@@ -879,7 +898,7 @@ def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> 
         "clear_metadata": lambda: execute_for_all_managers("clear_metadata"),
         "clear_cache": clear_cache,
         "clear_all": clear_all,
-        "all": lambda: (run_all(), delete_archives(), cleanup()),
+        "all": lambda: (run_all(), delete_archives(), cleanup(), build_search_index()),
         "check_integrity": check_integrity,
         "cleanup": cleanup,
         "build_search_index": build_search_index,
