@@ -781,29 +781,38 @@ def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> 
     def cleanup():
         # Get all theme files and package.json files
         all_theme_files = set()
-        for manager in managers.values():
+        for manager in tqdm(
+            managers.values(), desc="Getting all theme files", unit="manager"
+        ):
             all_theme_files.update(manager.get_all_theme_files())
 
         # Get all files in the themes directory
         themes_dir = next(iter(managers.values())).downloader.themes_dir
         all_files_in_dir = []
-        for path in glob.glob(os.path.join(themes_dir, "**", "*"), recursive=True):
+        for path in tqdm(
+            glob.glob(os.path.join(themes_dir, "**", "*"), recursive=True),
+            desc="Getting all files in themes directory",
+            unit="file",
+        ):
             all_files_in_dir.append(path.replace("./", ""))
 
         all_files_in_dir = set(all_files_in_dir)
 
         # Get the difference
         files_to_delete = all_files_in_dir - all_theme_files
-
         # Delete the difference files
-        for file_path in tqdm(files_to_delete, desc="Deleting invalid files"):
+        for file_path in tqdm(
+            files_to_delete, desc="Deleting invalid files", unit="file"
+        ):
             if os.path.isfile(file_path):
                 os.remove(file_path)
                 logging.info(f"Deleted file: {file_path}")
 
         # Remove empty directories
         for root, dirs, files in tqdm(
-            os.walk(themes_dir, topdown=False), desc="Removing empty directories"
+            os.walk(themes_dir, topdown=False),
+            desc="Removing empty directories",
+            unit="directory",
         ):
             for dir in dirs:
                 dir_path = os.path.join(root, dir)
