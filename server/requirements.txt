@@ -3,3 +3,4 @@ commentjson==0.9.0
 requests==2.32.3
 sentry-sdk==2.14.0
 tqdm==4.66.5
+pytest-mock==3.14.0

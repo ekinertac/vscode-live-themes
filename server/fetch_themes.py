@@ -15,6 +15,7 @@ import tempfile
 from tqdm import tqdm
 import sentry_sdk
 import glob
+from collections import defaultdict
 
 sentry_sdk.init(
     dsn="https://a7f5a48af43cecc6ed10281e52b0ebcb@o352105.ingest.us.sentry.io/4507953095245824",
@@ -244,6 +245,13 @@ class VSCodeThemeFetcher(ThemeFetcher):
                 )
                 continue
 
+            statistics = {}
+            for stat in extension.get("statistics", []):
+                if stat["statisticName"] == "install":
+                    statistics["installs"] = stat["value"]
+                elif stat["statisticName"] == "weightedRating":
+                    statistics["rating"] = stat["value"]
+
             # MARK: List.json
             themes.append(
                 {
@@ -254,6 +262,7 @@ class VSCodeThemeFetcher(ThemeFetcher):
                         "publisherName": extension["publisher"]["publisherName"],
                     },
                     "tags": extension["tags"],
+                    "statistics": statistics,
                     "extension": {
                         "extensionId": extension["extensionId"],
                         "extensionName": extension["extensionName"],
@@ -691,15 +700,11 @@ class ThemeManager:
         """Get all theme file paths and package.json files from theme lists."""
         all_files = set()
         themes = self.get_themes()
-        for theme in tqdm(themes, desc="Getting all theme files", unit="theme"):
+        for theme in themes:
             theme_dir = theme.get("theme_dir")
             if theme_dir and os.path.exists(theme_dir):
                 # Add theme files
-                for theme_file in tqdm(
-                    theme.get("theme_files", []),
-                    desc="Getting all theme files",
-                    unit="file",
-                ):
+                for theme_file in theme.get("theme_files", []):
                     all_files.add(theme_file["file"].replace("./", ""))
 
                 # Add package.json
@@ -707,6 +712,52 @@ class ThemeManager:
                 all_files.add(package_json_path.replace("./", ""))
 
         return list(all_files)
+
+    # MARK: - Search Index
+    def build_search_index(self) -> None:
+        """Build a search index for all themes and save it as search.json."""
+        all_themes = []
+
+        # Collect themes from all available sort options
+        for sort_option in ThemeSortOption:
+            themes = self.storage.load(sort_option)
+            all_themes.extend(themes)
+
+        # Remove duplicates based on extensionName and create the search index
+        unique_themes = {}
+        for theme in all_themes:
+            extension_name = theme["extension"]["extensionName"]
+            if extension_name not in unique_themes:
+                theme_files = []
+                if "theme_files" in theme:
+                    theme_files = [
+                        {
+                            "name": tf["name"],
+                            "path": "themes/themes/"
+                            + os.path.relpath(tf["file"], self.downloader.themes_dir),
+                        }
+                        for tf in theme["theme_files"]
+                    ]
+
+                unique_themes[extension_name] = {
+                    "label": theme["displayName"],
+                    "description": theme["publisher"]["displayName"],
+                    "extensionName": extension_name,
+                    "detail": f"""{len(theme_files)} {len(theme_files) > 1 and 'Themes' or 'Theme'}""",
+                    "themeFiles": theme_files,
+                }
+
+        # Convert the dictionary to a list for JSON serialization
+        search_index = list(unique_themes.values())
+
+        # Save search index to file
+        search_index_path = os.path.join(self.storage.base_path, "search.json")
+        with open(search_index_path, "w") as f:
+            json.dump(search_index, f, indent=2)
+
+        logging.info(f"Search index saved to {search_index_path}")
+        logging.info(f"Total unique themes indexed: {len(search_index)}")
+        # MARK: - Search Index
 
 
 def create_manager(
@@ -789,19 +840,13 @@ def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> 
     def cleanup():
         # Get all theme files and package.json files
         all_theme_files = set()
-        for manager in tqdm(
-            managers.values(), desc="Getting all theme files", unit="manager"
-        ):
+        for manager in managers.values():
             all_theme_files.update(manager.get_all_theme_files())
 
         # Get all files in the themes directory
         themes_dir = next(iter(managers.values())).downloader.themes_dir
         all_files_in_dir = []
-        for path in tqdm(
-            glob.glob(os.path.join(themes_dir, "**", "*"), recursive=True),
-            desc="Getting all files in themes directory",
-            unit="file",
-        ):
+        for path in glob.glob(os.path.join(themes_dir, "**", "*"), recursive=True):
             all_files_in_dir.append(path.replace("./", ""))
 
         all_files_in_dir = set(all_files_in_dir)
@@ -809,19 +854,13 @@ def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> 
         # Get the difference
         files_to_delete = all_files_in_dir - all_theme_files
         # Delete the difference files
-        for file_path in tqdm(
-            files_to_delete, desc="Deleting invalid files", unit="file"
-        ):
+        for file_path in files_to_delete:
             if os.path.isfile(file_path):
                 os.remove(file_path)
                 logging.info(f"Deleted file: {file_path}")
 
         # Remove empty directories
-        for root, dirs, files in tqdm(
-            os.walk(themes_dir, topdown=False),
-            desc="Removing empty directories",
-            unit="directory",
-        ):
+        for root, dirs, files in os.walk(themes_dir, topdown=False):
             for dir in dirs:
                 dir_path = os.path.join(root, dir)
                 if not os.listdir(dir_path):
@@ -829,6 +868,10 @@ def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> 
                     logging.info(f"Removed empty directory: {dir_path}")
 
         logging.info("Cleanup completed successfully.")
+
+    def build_search_index():
+        # Use the first manager to build the search index
+        next(iter(managers.values())).build_search_index()
 
     command_map = {
         "metadata": lambda: execute_for_all_managers("fetch_and_save_themes"),
@@ -839,6 +882,7 @@ def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> 
         "all": lambda: (run_all(), delete_archives(), cleanup()),
         "check_integrity": check_integrity,
         "cleanup": cleanup,
+        "build_search_index": build_search_index,
     }
 
     action = command_map.get(command)
@@ -887,6 +931,10 @@ def main():
     subparsers.add_parser(
         "cleanup",
         help="Remove invalid files and empty directories from the themes folder",
+    )
+    subparsers.add_parser(
+        "build_search_index",
+        help="Build a search index for all themes and save it as search.json",
     )
 
     args = parser.parse_args()

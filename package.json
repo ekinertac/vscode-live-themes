@@ -40,9 +40,7 @@
     "jetbrains"
   ],
   "main": "./dist/extension.js",
-  "activationEvents": [
-    "onCommand:live-themes.selectTheme"
-  ],
+  "activationEvents": [],
   "contributes": {
     "commands": [
       {
