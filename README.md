@@ -1,4 +1,4 @@
-# Live Theme Previewer for VS Code
+<h1 align="center">Live Theme Previewer for VS Code</h1>
 
 <p align="center">
   <img src="./images/icon.png" alt="Live Theme Previewer Icon">
