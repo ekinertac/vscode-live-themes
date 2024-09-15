@@ -18,10 +18,6 @@ const isEscaped = (jsonString: string, quotePosition: number) => {
 };
 
 export default function stripJsonComments(jsonString: string, { whitespace = true, trailingCommas = false } = {}) {
-  if (typeof jsonString !== 'string') {
-    throw new TypeError(`Expected argument \`jsonString\` to be a \`string\`, got \`${typeof jsonString}\``);
-  }
-
   const strip = whitespace ? stripWithWhitespace : stripWithoutWhitespace;
 
   let isInsideString: boolean = false;
@@ -109,9 +105,9 @@ export default function stripJsonComments(jsonString: string, { whitespace = tru
     }
   }
 
-  return (
-    result +
-    buffer +
-    (isInsideComment ? strip(jsonString.slice(offset), 0, jsonString.length - offset) : jsonString.slice(offset))
-  );
+  const endOfString = isInsideComment
+    ? strip(jsonString.slice(offset), 0, jsonString.length - offset)
+    : jsonString.slice(offset);
+
+  return result + buffer + endOfString;
 }

@@ -5,7 +5,7 @@ export function formatLabel(label: string) {
   }
 
   const iconMatch = label.match(/^\$\([^)]+\)/);
-  const icon = iconMatch ? iconMatch[0] : ''; // Add a space after the icon
+  const icon = iconMatch ? iconMatch[0] : '';
 
   // Extract the text after the icon
   const text = label.replace(icon, '').trim();

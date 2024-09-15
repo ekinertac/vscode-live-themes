@@ -100,7 +100,7 @@ export function createFileQuickPick(theme: Theme): vscode.QuickPick<ThemeFileQui
   ]);
   quickPick.items = [
     ...goBackItem,
-    ...(theme.theme_files || []).map((file: ThemeFile) => ({
+    ...theme.theme_files.map((file: ThemeFile) => ({
       label: file.name,
       description: file.file,
     })),
