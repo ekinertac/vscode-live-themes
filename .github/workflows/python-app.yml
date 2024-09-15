@@ -29,5 +29,5 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r server/requirements.txt; fi
       - name: Test with pytest
         run: |
+          cd server
           pytest
-                  - name: Setup Node.js environment
