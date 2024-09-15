@@ -11,7 +11,7 @@ cd "$(dirname "$0")"
 source $HOME/vscode-live-themes/server/venv/bin/activate
 
 # Run the Python script
-python3 $HOME/vscode-live-themes/server/fetch_themes.py --log-level ERROR --page-size 50 --max-pages 20 all >> $HOME/vscode-live-themes/server/cron.log 2>&1
+python3 $HOME/vscode-live-themes/server/main.py --log-level ERROR --page-size 50 --max-pages 20 all >> $HOME/vscode-live-themes/server/cron.log 2>&1
 
 # Deactivate virtual environment
 deactivate

@@ -12,13 +12,13 @@ def temp_dir():
         yield tmpdirname
 
 
-py_file = "python fetch_themes.py"
+py_file = "python main.py"
 mainParams = "--page-size=2 --max-pages=1"
 
 
 @pytest.fixture(scope="module")
 def fetch_themes_dir(temp_dir):
-    shutil.copy("fetch_themes.py", temp_dir)
+    shutil.copy("main.py", temp_dir)
     return temp_dir
 
 
@@ -43,8 +43,8 @@ def run_cli(command, cwd=None):
 # Basic setup tests
 def test_fetch_themes_file_exists(fetch_themes_dir):
     assert os.path.exists(
-        os.path.join(fetch_themes_dir, "fetch_themes.py")
-    ), "fetch_themes.py should exist in the temporary directory"
+        os.path.join(fetch_themes_dir, "main.py")
+    ), "main.py should exist in the temporary directory"
 
 
 def test_help_command(fetch_themes_dir):
