@@ -10,21 +10,18 @@ const __DEV__ = process.env.VSCODE_DEBUG_MODE === 'true';
 
 const THEMES_CACHE_KEY = 'liveThemes.cachedThemes';
 const axiosClient = axios.create({
-  baseURL: __DEV__ ? 'http://localhost:9000' : 'https://vscode-live-themes.ekinertac.com',
+  baseURL: 'https://vscode-live-themes.ekinertac.com',
 });
 
-async function fetchThemes(theme_list_file: string): Promise<Theme[]> {
+export async function fetchThemes(theme_list_file: string): Promise<Theme[]> {
   const response = await axiosClient.get(`/themes/${theme_list_file}.json`);
   return response.data;
 }
 
 export async function fetchThemeFile(fileUrl: string): Promise<any> {
   const response = await axiosClient.get(fileUrl);
-  if (typeof response.data === 'string') {
-    const themeContentObj = JSON.parse(stripJsonComments(response.data, { trailingCommas: true }));
-    return themeContentObj;
-  }
-  return response.data;
+  const themeContentObj = JSON.parse(stripJsonComments(response.data, { trailingCommas: true }));
+  return themeContentObj;
 }
 
 export async function getThemes(context: vscode.ExtensionContext, theme_list_file: string): Promise<Theme[]> {
