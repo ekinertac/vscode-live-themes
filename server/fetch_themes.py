@@ -796,13 +796,15 @@ def run_command(managers: Dict[ThemeSortOption, ThemeManager], command: str) -> 
         files_to_delete = all_files_in_dir - all_theme_files
 
         # Delete the difference files
-        for file_path in files_to_delete:
+        for file_path in tqdm(files_to_delete, desc="Deleting invalid files"):
             if os.path.isfile(file_path):
                 os.remove(file_path)
                 logging.info(f"Deleted file: {file_path}")
 
         # Remove empty directories
-        for root, dirs, files in os.walk(themes_dir, topdown=False):
+        for root, dirs, files in tqdm(
+            os.walk(themes_dir, topdown=False), desc="Removing empty directories"
+        ):
             for dir in dirs:
                 dir_path = os.path.join(root, dir)
                 if not os.listdir(dir_path):
