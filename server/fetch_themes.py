@@ -313,6 +313,9 @@ class JSONThemeStorage(ThemeStorage):
             temp_file.close()
             final_path = os.path.join(self.base_path, file_name)
             os.replace(temp_file.name, final_path)
+            os.chmod(
+                final_path, 0o644
+            )  # Set read and write permissions for owner, read for others
         except Exception as e:
             os.unlink(temp_file.name)
             raise e
